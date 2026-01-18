@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Builder - FR/EN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Outfit"', 'sans-serif'],
+                        mono: ['"Roboto Mono"', 'monospace'],
+                    },
+                    colors: {
+                        md: {
+                            sys: {
+                                primary: '#0b57d0',
+                                surface: '#f0f4f9',
+                                on_surface: '#1f1f1f',
+                                warning: '#ffab00', // Warning color
+                                on_warning: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f0f4f9; }
+        
+        /* Material 3 Input Style */
+        .m3-field {
+            position: relative;
+            background-color: #f0f4f9;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #747775;
+            transition: all 0.2s;
+        }
+        .m3-field:focus-within {
+            background-color: #e8edfa;
+            border-bottom: 2px solid #0b57d0;
+        }
+        .m3-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 24px 16px 8px 16px;
+            outline: none;
+            font-size: 1rem;
+            color: #1f1f1f;
+        }
+        
+        .m3-input:not(:focus)::placeholder {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .m3-label {
+            position: absolute;
+            left: 16px;
+            top: 18px;
+            font-size: 1rem;
+            color: #444746;
+            pointer-events: none;
+            transition: 0.2s ease all;
+        }
+        .m3-input:focus ~ .m3-label,
+        .m3-input:not(:placeholder-shown) ~ .m3-label {
+            top: 6px;
+            font-size: 0.75rem;
+            color: #0b57d0;
+            font-weight: 500;
+        }
+
+        /* Checkbox */
+        .m3-checkbox-container { display: flex; align-items: center; cursor: pointer; padding: 8px 0; }
+        .m3-checkbox {
+            appearance: none; background-color: #fff; margin: 0; font: inherit; color: currentColor;
+            width: 1.15em; height: 1.15em; border: 2px solid #747775; border-radius: 2px;
+            display: grid; place-content: center; margin-right: 12px; transition: 0.2s all;
+        }
+        .m3-checkbox::before {
+            content: ""; width: 0.65em; height: 0.65em; transform: scale(0);
+            transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white;
+            transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .m3-checkbox:checked { background-color: #0b57d0; border-color: #0b57d0; }
+        .m3-checkbox:checked::before { transform: scale(1); }
+
+        /* Syntax Highlighting */
+        .json-key { color: #9a0036; } .json-string { color: #00600f; } .json-number { color: #1a237e; } .json-boolean { color: #0b57d0; font-weight: bold; }
+
+        /* Scrollbar & Tabs */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c4c7c5; border-radius: 4px; }
+        .tab-active { background-color: #d3e3fd; color: #041e49; font-weight: 600; }
+        .tab-inactive { background-color: transparent; color: #444746; }
+        .tab-inactive:hover { background-color: #f0f4f9; }
+
+        /* Warning Banner Animation */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .warning-banner { animation: slideDown 0.3s ease-out; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
+
+    <aside class="w-full md:w-[500px] flex flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg">
+        <div class="p-4 flex items-center justify-between border-b border-gray-100">
+            <h1 class="text-xl font-normal tracking-tight text-[#444746]">Prompt<span class="font-medium text-md-sys-primary">Builder</span></h1>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="toggleLanguage()" class="text-sm font-medium text-md-sys-primary hover:bg-blue-50 px-3 py-1 rounded-full transition border border-blue-100">
+                    <span id="lang-display">FR</span> <i class="fas fa-globe ml-1"></i>
+                </button>
+                <button onclick="resetForm()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition" id="btn-reset" title="Effacer tout">
+                    <i class="fas fa-eraser"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-4 space-y-6 pb-20">
+            
+            <div class="m3-field">
+                <input type="text" id="role" class="m3-input" placeholder=" " oninput="updateOutput()">
+                <label class="m3-label" id="lbl-role">1. Persona (Rôle)</label>
+            </div>
+
+            <div class="m3-field">
+                <textarea id="task" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
+                <label class="m3-label" id="lbl-task">2. Tâche (Mission)</label>
+            </div>
+
+            <div class="m3-field">
+                <textarea id="context" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
+                <label class="m3-label" id="lbl-context">3. Contexte</label>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-format">4. Format & Contraintes</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="m3-field rounded-t-lg">
+                        <select id="tone" class="m3-input pt-6 bg-transparent" onchange="updateOutput()">
+                            </select>
+                        <label class="m3-label" id="lbl-tone">Ton</label>
+                        <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
+                    </div>
+
+                    <div class="m3-field rounded-t-lg">
+                        <select id="format" class="m3-input pt-6 bg-transparent" onchange="updateOutput()">
+                            </select>
+                        <label class="m3-label" id="lbl-format">Format</label>
+                        <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="m3-field">
+                    <input type="text" id="constraints" class="m3-input" placeholder=" " oninput="updateOutput()">
+                    <label class="m3-label" id="lbl-constraints">Autres contraintes</label>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-files">5. Pièces jointes</h3>
+                <div class="border border-dashed border-[#747775] rounded-xl p-4 bg-white hover:bg-md-sys-surface transition cursor-pointer relative" id="drop-zone">
+                    <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple onchange="handleFiles(this.files)">
+                    <div class="text-center">
+                        <i class="fas fa-cloud-upload-alt text-md-sys-primary text-xl mb-1"></i>
+                        <p class="text-sm text-[#444746]" id="txt-dropzone">Glisser des fichiers ou <span class="text-md-sys-primary font-medium">Parcourir</span></p>
+                    </div>
+                </div>
+                <div id="file-list" class="flex flex-wrap gap-2"></div>
+                
+                <div id="file-warning" class="hidden warning-banner bg-orange-50 border border-orange-200 rounded-lg p-3 flex gap-3 items-start mt-2">
+                    <i class="fas fa-exclamation-triangle text-orange-500 mt-0.5 text-sm"></i>
+                    <p class="text-xs text-orange-800 leading-relaxed" id="txt-file-warning">
+                        Le copier-coller ne transfère pas les fichiers. 
+                        <strong>Vous devrez glisser-déposer ces fichiers manuellement dans Gemini.</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-instructions">6. Instructions spécifiques</h3>
+                    <button onclick="addInstruction()" class="text-md-sys-primary hover:bg-blue-50 w-6 h-6 rounded-full flex items-center justify-center transition"><i class="fas fa-plus text-xs"></i></button>
+                </div>
+                <div id="instructions-container" class="space-y-2"></div>
+            </div>
+
+            <div class="pt-2 border-t border-gray-100">
+                <label class="m3-checkbox-container">
+                    <input type="checkbox" id="feedback-loop" class="m3-checkbox" onchange="updateOutput()">
+                    <span class="text-sm text-[#444746] font-medium" id="lbl-feedback">Activer la boucle de feedback</span>
+                </label>
+                <p class="text-xs text-gray-400 pl-8" id="txt-feedback-help">Demande à l'IA de poser des questions de clarification avant de répondre.</p>
+            </div>
+
+        </div>
+    </aside>
+
+    <main class="flex-grow flex flex-col h-full bg-md-sys-surface overflow-hidden relative">
+        
+        <div class="flex-none px-6 pt-6 pb-2 flex justify-between items-end">
+            <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-active px-6 py-2 rounded-full text-sm transition-all duration-200 flex items-center gap-2">
+                    <i class="fab fa-markdown"></i> <span id="lbl-preview">Aperçu</span>
+                </button>
+                <button onclick="switchTab('json')" id="tab-btn-json" class="tab-inactive px-6 py-2 rounded-full text-sm transition-all duration-200 flex items-center gap-2">
+                    <i class="fas fa-code"></i> JSON
+                </button>
+            </div>
+            
+            <button onclick="copyCurrentContent()" class="bg-md-sys-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-full shadow-elevation-1 transition-all flex items-center gap-2 text-sm font-medium">
+                <i class="far fa-copy"></i>
+                <span id="copy-btn-text">Copier</span>
+            </button>
+        </div>
+
+        <div class="flex-grow p-6 overflow-hidden">
+            <div class="h-full w-full bg-white rounded-3xl border border-white shadow-sm overflow-hidden flex flex-col relative">
+                
+                <div id="view-markdown" class="p-8 overflow-y-auto h-full prose prose-slate max-w-none font-sans text-gray-700">
+                    <div class="flex items-center gap-2 text-gray-400 mb-4 opacity-50 select-none">
+                        <i class="fas fa-sparkles"></i> <span id="lbl-generated">Aperçu généré (Langage Naturel)</span>
+                    </div>
+                    <div id="markdown-content" class="whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+
+                <div id="view-json" class="hidden p-0 h-full bg-[#1e1e1e] overflow-auto">
+                    <pre class="p-6 text-sm font-mono leading-relaxed text-[#e0e0e0]"><code id="json-content"></code></pre>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toast" class="fixed bottom-6 right-6 bg-[#323232] text-white px-4 py-3 rounded shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="txt-toast">Copié dans le presse-papier</span>
+    </div>
+
+    <script>
+        // --- TRANSLATIONS DATA ---
+        const translations = {
+            fr: {
+                // UI Labels
+                lbl_role: "1. Persona (Rôle)",
+                ph_role: "Ex: Chef de projet Google Cloud, Expert Marketing...",
+                lbl_task: "2. Tâche (Mission)",
+                ph_task: "Ex: Rédiger un email de résumé exécutif...",
+                lbl_context: "3. Context",
+                ph_context: "Ex: Basé sur les docs du programme, Cible : Cadres...",
+                lbl_header_format: "4. Format & Contraintes",
+                lbl_tone: "Ton",
+                lbl_format: "Format",
+                lbl_constraints: "Autres contraintes",
+                ph_constraints: "Ex: Moins de 200 mots, structure stricte...",
+                lbl_header_files: "5. Pièces jointes",
+                txt_dropzone: "Glisser des fichiers ou <span class='text-md-sys-primary font-medium'>Parcourir</span>",
+                txt_file_warning: "Le copier-coller ne transfère pas les fichiers. <strong>Vous devrez glisser-déposer ces fichiers manuellement dans Gemini.</strong>",
+                lbl_header_instructions: "6. Instructions spécifiques",
+                lbl_feedback: "Activer la boucle de feedback",
+                txt_feedback_help: "Demande à l'IA de poser des questions de clarification avant de répondre.",
+                lbl_preview: "Aperçu",
+                lbl_generated: "Aperçu généré (Langage Naturel)",
+                btn_copy: "Copier",
+                txt_toast: "Copié dans le presse-papier",
+                
+                // Prompt Generation Template
+                prompt_you_are: "Tu es un",
+                prompt_task: "Ta mission est de :",
+                prompt_context: "Contexte :",
+                prompt_tone: "Adopte un ton",
+                prompt_format: "Le format de sortie doit être :",
+                prompt_constraints: "Contraintes à respecter :",
+                prompt_files: "Utilise les informations contenues dans les fichiers joints (que je vais uploader) pour ta réponse :",
+                prompt_file_item: "[Fichier : ",
+                prompt_instructions: "Instructions supplémentaires :",
+                prompt_feedback: "\n---\n**IMPORTANT :** Avant de générer la réponse finale, pose-moi des questions si tu as besoin de précisions ou de contexte supplémentaire pour fournir le meilleur résultat possible."
+            },
+            en: {
+                // UI Labels
+                lbl_role: "1. Persona (Role)",
+                ph_role: "Ex: Google Cloud Project Manager, Marketing Expert...",
+                lbl_task: "2. Task (Mission)",
+                ph_task: "Ex: Draft an executive summary email...",
+                lbl_context: "3. Context",
+                ph_context: "Ex: Based on program docs, Target: Executives...",
+                lbl_header_format: "4. Format & Constraints",
+                lbl_tone: "Tone",
+                lbl_format: "Format",
+                lbl_constraints: "Other Constraints",
+                ph_constraints: "Ex: Less than 200 words, strict structure...",
+                lbl_header_files: "5. Attachments",
+                txt_dropzone: "Drag files or <span class='text-md-sys-primary font-medium'>Browse</span>",
+                txt_file_warning: "Copy/paste does not transfer files. <strong>You must manually drag and drop these files into Gemini.</strong>",
+                lbl_header_instructions: "6. Specific Instructions",
+                lbl_feedback: "Enable Feedback Loop",
+                txt_feedback_help: "Ask the AI to ask clarifying questions before answering.",
+                lbl_preview: "Preview",
+                lbl_generated: "Generated Preview (Natural Language)",
+                btn_copy: "Copy",
+                txt_toast: "Copied to clipboard",
+
+                // Prompt Generation Template
+                prompt_you_are: "You are a",
+                prompt_task: "Your task is to:",
+                prompt_context: "Context:",
+                prompt_tone: "Adopt a tone that is",
+                prompt_format: "The output format must be:",
+                prompt_constraints: "Constraints to follow:",
+                prompt_files: "Use the information contained in the attached files (which I will upload) for your response:",
+                prompt_file_item: "[File: ",
+                prompt_instructions: "Additional Instructions:",
+                prompt_feedback: "\n---\n**IMPORTANT:** Before generating the final response, ask me questions if you need clarification or additional context to provide the best possible output."
+            }
+        };
+
+        // Option Data
+        const toneOptions = [
+            { key: "", fr: "Par défaut", en: "Default" },
+            { key: "professional", fr: "Professionnel & Neutre", en: "Professional & Neutral" },
+            { key: "formal", fr: "Formel & Officiel", en: "Formal & Official" },
+            { key: "informal", fr: "Informel & Casual", en: "Informal & Casual" },
+            { key: "empathetic", fr: "Bienveillant & Empathique", en: "Empathetic & Kind" },
+            { key: "direct", fr: "Direct & Concis", en: "Direct & Concise" },
+            { key: "confident", fr: "Confiant & Ferme", en: "Confident & Firm" },
+            { key: "persuasive", fr: "Commercial & Persuasif", en: "Persuasive & Sales-oriented" },
+            { key: "creative", fr: "Créatif & Original", en: "Creative & Original" },
+            { key: "technical", fr: "Technique & Précis", en: "Technical & Precise" },
+            { key: "inspiring", fr: "Inspirant & Optimiste", en: "Inspiring & Optimistic" },
+            { key: "eli5", fr: "Vulgarisé (ELI5)", en: "Simplified (ELI5)" }
+        ];
+
+        const formatOptions = [
+            { key: "", fr: "Texte libre", en: "Free Text" },
+            { key: "bullet", fr: "Liste à puces", en: "Bullet Points" },
+            { key: "table", fr: "Tableau structuré", en: "Structured Table" },
+            { key: "email", fr: "Email complet", en: "Full Email" },
+            { key: "checklist", fr: "Checklist (Pas à pas)", en: "Checklist (Step-by-step)" },
+            { key: "blog", fr: "Article de Blog", en: "Blog Post" },
+            { key: "social", fr: "Post Réseaux Sociaux", en: "Social Media Post" },
+            { key: "script", fr: "Script de présentation", en: "Presentation Script" },
+            { key: "outline", fr: "Plan détaillé", en: "Detailed Outline" },
+            { key: "code", fr: "Code Block", en: "Code Block" },
+            { key: "json", fr: "JSON", en: "JSON" }
+        ];
+
+        // --- STATE ---
+        let state = {
+            lang: 'fr',
+            role: "",
+            task: "",
+            context: "",
+            toneKey: "",
+            formatKey: "",
+            constraints: "",
+            feedbackLoop: false,
+            files: [],
+            instructions: [""]
+        };
+        
+        let currentTab = 'markdown';
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOptions();
+            applyLanguage();
+            renderInstructions();
+            updateOutput();
+        });
+
+        // --- LANGUAGE LOGIC ---
+        function toggleLanguage() {
+            state.lang = state.lang === 'fr' ? 'en' : 'fr';
+            applyLanguage();
+            renderOptions(); 
+            updateOutput();
+        }
+
+        function applyLanguage() {
+            const t = translations[state.lang];
+            
+            document.getElementById('lang-display').innerText = state.lang.toUpperCase();
+
+            document.getElementById('lbl-role').innerText = t.lbl_role;
+            document.getElementById('role').placeholder = t.ph_role;
+            
+            document.getElementById('lbl-task').innerText = t.lbl_task;
+            document.getElementById('task').placeholder = t.ph_task;
+            
+            document.getElementById('lbl-context').innerText = t.lbl_context;
+            document.getElementById('context').placeholder = t.ph_context;
+
+            document.getElementById('lbl-header-format').innerText = t.lbl_header_format;
+            document.getElementById('lbl-tone').innerText = t.lbl_tone;
+            document.getElementById('lbl-format').innerText = t.lbl_format;
+            
+            document.getElementById('lbl-constraints').innerText = t.lbl_constraints;
+            document.getElementById('constraints').placeholder = t.ph_constraints;
+
+            document.getElementById('lbl-header-files').innerText = t.lbl_header_files;
+            document.getElementById('txt-dropzone').innerHTML = t.txt_dropzone;
+            document.getElementById('txt-file-warning').innerHTML = t.txt_file_warning; // Update warning text
+
+            document.getElementById('lbl-header-instructions').innerText = t.lbl_header_instructions;
+            document.getElementById('lbl-feedback').innerText = t.lbl_feedback;
+            document.getElementById('txt-feedback-help').innerText = t.txt_feedback_help;
+
+            document.getElementById('lbl-preview').innerText = t.lbl_preview;
+            document.getElementById('copy-btn-text').innerText = t.btn_copy;
+            document.getElementById('lbl-generated').innerText = t.lbl_generated;
+            document.getElementById('txt-toast').innerText = t.txt_toast;
+        }
+
+        function renderOptions() {
+            const currentTone = document.getElementById('tone').value;
+            const currentFormat = document.getElementById('format').value;
+
+            const toneSelect = document.getElementById('tone');
+            toneSelect.innerHTML = toneOptions.map(opt => 
+                `<option value="${opt.key}" ${state.toneKey === opt.key ? 'selected' : ''}>${opt[state.lang]}</option>`
+            ).join('');
+
+            const formatSelect = document.getElementById('format');
+            formatSelect.innerHTML = formatOptions.map(opt => 
+                `<option value="${opt.key}" ${state.formatKey === opt.key ? 'selected' : ''}>${opt[state.lang]}</option>`
+            ).join('');
+        }
+
+        // --- CORE LOGIC ---
+        function updateStateFromDOM() {
+            state.role = document.getElementById('role').value;
+            state.task = document.getElementById('task').value;
+            state.context = document.getElementById('context').value;
+            state.toneKey = document.getElementById('tone').value;
+            state.formatKey = document.getElementById('format').value;
+            state.constraints = document.getElementById('constraints').value;
+            state.feedbackLoop = document.getElementById('feedback-loop').checked;
+            
+            const inputs = document.querySelectorAll('#instructions-container input');
+            state.instructions = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== "");
+        }
+
+        function updateOutput() {
+            updateStateFromDOM();
+            
+            // Check files for warning
+            const warningEl = document.getElementById('file-warning');
+            if (state.files.length > 0) {
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+
+            // Update Markdown View
+            const md = generateMarkdown();
+            const emptyText = state.lang === 'fr' ? "Remplissez le formulaire..." : "Fill in the form...";
+            document.getElementById('markdown-content').innerHTML = md || `<p class="text-gray-400 italic">${emptyText}</p>`;
+
+            // Update JSON View
+            const json = generateJSON();
+            document.getElementById('json-content').innerHTML = syntaxHighlight(JSON.stringify(json, null, 2));
+        }
+
+        function generateMarkdown() {
+            const t = translations[state.lang];
+            let prompt = "";
+            
+            if (state.role) prompt += `${t.prompt_you_are} **${state.role.trim()}**. `;
+            if (state.task) {
+                let taskText = state.task.trim();
+                if (!/[.!?]$/.test(taskText)) taskText += ".";
+                prompt += `${t.prompt_task} ${taskText}\n\n`;
+            }
+            if (state.context) prompt += `**${t.prompt_context}** ${state.context.trim()}\n\n`;
+            
+            let details = [];
+            if (state.toneKey) {
+                const toneObj = toneOptions.find(o => o.key === state.toneKey);
+                const toneText = toneObj ? toneObj[state.lang] : state.toneKey;
+                details.push(`${t.prompt_tone} **${toneText}**.`);
+            }
+            if (state.formatKey) {
+                const formatObj = formatOptions.find(o => o.key === state.formatKey);
+                const formatText = formatObj ? formatObj[state.lang] : state.formatKey;
+                details.push(`${t.prompt_format} **${formatText}**.`);
+            }
+            if (state.constraints) details.push(`${t.prompt_constraints} ${state.constraints}.`);
+
+            if (details.length > 0) prompt += details.join(" ") + "\n\n";
+
+            if (state.files.length > 0) {
+                prompt += `${t.prompt_files}\n`;
+                state.files.forEach(f => prompt += `- ${t.prompt_file_item}${f.name}]\n`);
+                prompt += `\n`;
+            }
+
+            if (state.instructions.length > 0 && state.instructions[0] !== "") {
+                prompt += `**${t.prompt_instructions}**\n`;
+                state.instructions.forEach(i => prompt += `- ${i}\n`);
+                prompt += `\n`;
+            }
+
+            if (state.feedbackLoop) prompt += t.prompt_feedback;
+
+            return prompt;
+        }
+
+        function generateJSON() {
+            return {
+                meta: { language: state.lang },
+                role: state.role,
+                task: state.task,
+                context: state.context,
+                parameters: {
+                    tone: state.toneKey,
+                    format: state.formatKey,
+                    constraints: state.constraints,
+                    interactive_mode: state.feedbackLoop
+                },
+                attachments: state.files.map(f => f.name),
+                instructions: state.instructions
+            };
+        }
+
+        // --- UTILS ---
+        function handleFiles(fileList) {
+            state.files = [...state.files, ...Array.from(fileList)];
+            renderFiles();
+            updateOutput();
+        }
+        function renderFiles() {
+            const container = document.getElementById('file-list');
+            container.innerHTML = '';
+            state.files.forEach((f, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2';
+                badge.innerHTML = `<i class="fas fa-file"></i> ${f.name} <button onclick="removeFile(${idx})" class="hover:text-red-500"><i class="fas fa-times"></i></button>`;
+                container.appendChild(badge);
+            });
+        }
+        function removeFile(index) {
+            state.files.splice(index, 1);
+            renderFiles();
+            updateOutput();
+        }
+        function renderInstructions() {
+            const container = document.getElementById('instructions-container');
+            if(container.children.length === 0) addInstruction();
+        }
+        function addInstruction() {
+            const container = document.getElementById('instructions-container');
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2 animate-[fadeIn_0.2s]';
+            div.innerHTML = `
+                <input type="text" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="..." oninput="updateOutput()">
+                <button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(div);
+            div.querySelector('input').focus();
+        }
+        function switchTab(tab) {
+            currentTab = tab;
+            const mdView = document.getElementById('view-markdown');
+            const jsonView = document.getElementById('view-json');
+            const btnMd = document.getElementById('tab-btn-markdown');
+            const btnJson = document.getElementById('tab-btn-json');
+            if (tab === 'markdown') {
+                mdView.classList.remove('hidden'); jsonView.classList.add('hidden');
+                btnMd.className = 'tab-active px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
+                btnJson.className = 'tab-inactive px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
+            } else {
+                mdView.classList.add('hidden'); jsonView.classList.remove('hidden');
+                btnMd.className = 'tab-inactive px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
+                btnJson.className = 'tab-active px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
+            }
+            updateOutput();
+        }
+        function copyCurrentContent() {
+            let content = currentTab === 'markdown' ? generateMarkdown() : JSON.stringify(generateJSON(), null, 2);
+            navigator.clipboard.writeText(content).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                setTimeout(() => toast.classList.add('opacity-0'), 2000);
+            });
+        }
+        function resetForm() {
+            const confirmMsg = state.lang === 'fr' ? "Tout effacer ?" : "Clear all?";
+            if(confirm(confirmMsg)) {
+                document.querySelectorAll('input, textarea, select').forEach(el => {
+                    if(el.type === 'checkbox') el.checked = false;
+                    else el.value = '';
+                });
+                state.files = [];
+                state.instructions = [""];
+                renderFiles();
+                document.getElementById('instructions-container').innerHTML = '';
+                addInstruction();
+                renderOptions(); 
+                updateOutput();
+            }
+        }
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) cls = 'json-key';
+                    else cls = 'json-string';
+                } else if (/true|false/.test(match)) cls = 'json-boolean';
+                else if (/null/.test(match)) cls = 'text-gray-500';
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+    </script>
+</body>
+</html>
