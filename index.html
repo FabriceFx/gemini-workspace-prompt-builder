@@ -19,7 +19,7 @@
                                 primary: '#0b57d0',
                                 surface: '#f0f4f9',
                                 on_surface: '#1f1f1f',
-                                warning: '#ffab00', // Warning color
+                                warning: '#ffab00',
                                 on_warning: '#ffffff'
                             }
                         }
@@ -114,7 +114,7 @@
 <body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
 
     <aside class="w-full md:w-[500px] flex flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg">
-        <div class="p-4 flex items-center justify-between border-b border-gray-100">
+        <div class="p-4 flex items-center justify-between border-b border-gray-100 flex-none">
             <h1 class="text-xl font-normal tracking-tight text-[#444746]">Prompt<span class="font-medium text-md-sys-primary">Builder</span></h1>
             
             <div class="flex items-center gap-2">
@@ -127,7 +127,7 @@
             </div>
         </div>
 
-        <div class="flex-grow overflow-y-auto p-4 space-y-6 pb-20">
+        <div class="flex-grow overflow-y-auto p-4 space-y-6">
             
             <div class="m3-field">
                 <input type="text" id="role" class="m3-input" placeholder=" " oninput="updateOutput()">
@@ -179,7 +179,6 @@
                     </div>
                 </div>
                 <div id="file-list" class="flex flex-wrap gap-2"></div>
-                
                 <div id="file-warning" class="hidden warning-banner bg-orange-50 border border-orange-200 rounded-lg p-3 flex gap-3 items-start mt-2">
                     <i class="fas fa-exclamation-triangle text-orange-500 mt-0.5 text-sm"></i>
                     <p class="text-xs text-orange-800 leading-relaxed" id="txt-file-warning">
@@ -205,6 +204,15 @@
                 <p class="text-xs text-gray-400 pl-8" id="txt-feedback-help">Demande à l'IA de poser des questions de clarification avant de répondre.</p>
             </div>
 
+        </div>
+
+        <div class="flex-none p-4 border-t border-gray-200 bg-gray-50 text-center">
+            <p class="text-xs text-gray-500 mb-2">
+                <span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong>
+            </p>
+            <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
+                <i class="fab fa-paypal"></i> <span id="lbl-tip">M'offrir un pourboire</span>
+            </a>
         </div>
     </aside>
 
@@ -259,7 +267,7 @@
                 ph_role: "Ex: Chef de projet Google Cloud, Expert Marketing...",
                 lbl_task: "2. Tâche (Mission)",
                 ph_task: "Ex: Rédiger un email de résumé exécutif...",
-                lbl_context: "3. Context",
+                lbl_context: "3. Contexte",
                 ph_context: "Ex: Basé sur les docs du programme, Cible : Cadres...",
                 lbl_header_format: "4. Format & Contraintes",
                 lbl_tone: "Ton",
@@ -276,6 +284,9 @@
                 lbl_generated: "Aperçu généré (Langage Naturel)",
                 btn_copy: "Copier",
                 txt_toast: "Copié dans le presse-papier",
+                // Footer
+                lbl_developed: "Développé par",
+                lbl_tip: "M'offrir un pourboire",
                 
                 // Prompt Generation Template
                 prompt_you_are: "Tu es un",
@@ -312,6 +323,9 @@
                 lbl_generated: "Generated Preview (Natural Language)",
                 btn_copy: "Copy",
                 txt_toast: "Copied to clipboard",
+                // Footer
+                lbl_developed: "Developed by",
+                lbl_tip: "Leave a tip",
 
                 // Prompt Generation Template
                 prompt_you_are: "You are a",
@@ -412,7 +426,7 @@
 
             document.getElementById('lbl-header-files').innerText = t.lbl_header_files;
             document.getElementById('txt-dropzone').innerHTML = t.txt_dropzone;
-            document.getElementById('txt-file-warning').innerHTML = t.txt_file_warning; // Update warning text
+            document.getElementById('txt-file-warning').innerHTML = t.txt_file_warning;
 
             document.getElementById('lbl-header-instructions').innerText = t.lbl_header_instructions;
             document.getElementById('lbl-feedback').innerText = t.lbl_feedback;
@@ -422,6 +436,10 @@
             document.getElementById('copy-btn-text').innerText = t.btn_copy;
             document.getElementById('lbl-generated').innerText = t.lbl_generated;
             document.getElementById('txt-toast').innerText = t.txt_toast;
+
+            // Footer
+            document.getElementById('lbl-developed').innerText = t.lbl_developed;
+            document.getElementById('lbl-tip').innerText = t.lbl_tip;
         }
 
         function renderOptions() {
