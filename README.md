@@ -7,9 +7,11 @@
 
 **[Français]**
 Un outil interactif et intuitif pour structurer vos prompts Gemini dans Google Workspace. Basé sur les directives officielles, il permet de construire des requêtes complètes incluant Persona, Tâche, Contexte et Format.
+https://fabricefx.github.io/gemini-workspace-prompt-builder/
 
 **[English]**
 An interactive and intuitive tool to structure Gemini prompts for Google Workspace. Based on official guidelines, it helps build complete queries including Persona, Task, Context, and Format.
+https://fabricefx.github.io/gemini-workspace-prompt-builder/
 
 ---
 
