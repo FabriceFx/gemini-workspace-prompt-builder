@@ -1,2 +1,63 @@
-# gemini-workspace-prompt-builder
-Interactive tool to structure Gemini for Google Workspace prompts (Persona, Task, Context, Format) based on the official guide. / Outil interactif pour structurer vos prompts Gemini selon le guide officiel. Simple, efficace &amp; bilingue (FR/EN).
+# Gemini Workspace Prompt Builder
+
+![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/Platform-Google%20Apps%20Script-green)
+![Runtime](https://img.shields.io/badge/Google%20Apps%20Script-V8-green)
+![Author](https://img.shields.io/badge/Auteur-Fabrice%20Faucheux-orange)
+
+**[Français]**
+Un outil interactif et intuitif pour structurer vos prompts Gemini dans Google Workspace. Basé sur les directives officielles, il permet de construire des requêtes complètes incluant Persona, Tâche, Contexte et Format.
+
+**[English]**
+An interactive and intuitive tool to structure Gemini prompts for Google Workspace. Based on official guidelines, it helps build complete queries including Persona, Task, Context, and Format.
+
+---
+
+## 🚀 Fonctionnalités / Features
+
+### 🇫🇷 Français
+* **Interface Bilingue** : Basculez instantanément entre l'interface en français et en anglais.
+* **Structure Guidée** : Champs dédiés pour le Rôle, la Tâche, le Contexte, et les Contraintes.
+* **Personnalisation Avancée** :
+    * Sélection du **Ton** (Professionnel, Empathique, Créatif, etc.).
+    * Sélection du **Format** de sortie (Tableau, Code, Email, JSON, etc.).
+* **Prévisualisation en Temps Réel** :
+    * Vue **Markdown** pour le langage naturel.
+    * Vue **JSON** pour les intégrations techniques via API.
+* **Gestion des Pièces Jointes** : Simulation d'ajout de fichiers avec avertissements UX.
+* **Design Moderne** : Interface Material 3 stylisée avec Tailwind CSS.
+
+### 🇬🇧 English
+* **Bilingual Interface**: Instantly toggle between French and English UI.
+* **Guided Structure**: Dedicated fields for Role, Task, Context, and Constraints.
+* **Advanced Customization**:
+    * **Tone** selection (Professional, Empathetic, Creative, etc.).
+    * **Output Format** selection (Table, Code, Email, JSON, etc.).
+* **Real-time Preview**:
+    * **Markdown** view for natural language.
+    * **JSON** view for technical API integrations.
+* **Attachment Handling**: File upload simulation with UX warnings.
+* **Modern Design**: Material 3 interface styled with Tailwind CSS.
+
+---
+
+## 📦 Installation & Usage
+
+### 1. Utilisation locale / Local Usage
+Le projet est conçu comme un fichier unique autonome.
+1. Téléchargez le fichier `index.html`.
+2. Ouvrez-le directement dans votre navigateur web (Chrome, Firefox, Edge).
+3. Aucune compilation n'est nécessaire (Tailwind est chargé via CDN).
+
+### 2. Google Apps Script (Optionnel)
+Pour déployer cet outil en tant qu'application Web Google Apps Script :
+1. Créez un nouveau projet sur [script.google.com](https://script.google.com).
+2. Créez un fichier HTML nommé `index`.
+3. Collez le contenu de `index.html`.
+4. Ajoutez le code suivant dans `Code.gs` :
+   ```javascript
+   function doGet() {
+     return HtmlService.createHtmlOutputFromFile('index')
+       .setTitle('Prompt Builder')
+       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+   }
