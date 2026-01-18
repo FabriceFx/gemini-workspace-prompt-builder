@@ -2,15 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Outil de création de prompts IA bilingue.">
     <title>Prompt Builder - FR/EN</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Outfit"', 'sans-serif'],
+                        // Configuration correcte : Google Sans Flex en priorité
+                        sans: ['"Google Sans Flex"', '"Outfit"', 'sans-serif'],
                         mono: ['"Roboto Mono"', 'monospace'],
                     },
                     colors: {
@@ -19,8 +22,6 @@
                                 primary: '#0b57d0',
                                 surface: '#f0f4f9',
                                 on_surface: '#1f1f1f',
-                                warning: '#ffab00',
-                                on_warning: '#ffffff'
                             }
                         }
                     }
@@ -28,11 +29,21 @@
             }
         }
     </script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f0f4f9; }
+        /* Base & Reset */
+        body { 
+            font-family: 'Google Sans Flex', 'Outfit', sans-serif; 
+            background-color: #f0f4f9; 
+            overscroll-behavior-y: none; 
+        }
         
         /* Material 3 Input Style */
         .m3-field {
@@ -42,40 +53,20 @@
             border-bottom: 1px solid #747775;
             transition: all 0.2s;
         }
-        .m3-field:focus-within {
-            background-color: #e8edfa;
-            border-bottom: 2px solid #0b57d0;
-        }
+        .m3-field:focus-within { background-color: #e8edfa; border-bottom: 2px solid #0b57d0; }
         .m3-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            padding: 24px 16px 8px 16px;
-            outline: none;
-            font-size: 1rem;
-            color: #1f1f1f;
+            width: 100%; background: transparent; border: none; padding: 24px 16px 8px 16px;
+            outline: none; font-size: 1rem; color: #1f1f1f; line-height: 1.5;
+            /* Important pour hériter de Google Sans Flex dans les inputs */
+            font-family: inherit; 
         }
-        
-        .m3-input:not(:focus)::placeholder {
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
+        .m3-input:not(:focus)::placeholder { opacity: 0; transition: opacity 0.2s; }
         .m3-label {
-            position: absolute;
-            left: 16px;
-            top: 18px;
-            font-size: 1rem;
-            color: #444746;
-            pointer-events: none;
-            transition: 0.2s ease all;
+            position: absolute; left: 16px; top: 18px; font-size: 1rem; color: #444746;
+            pointer-events: none; transition: 0.2s ease all; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .m3-input:focus ~ .m3-label,
-        .m3-input:not(:placeholder-shown) ~ .m3-label {
-            top: 6px;
-            font-size: 0.75rem;
-            color: #0b57d0;
-            font-weight: 500;
+        .m3-input:focus ~ .m3-label, .m3-input:not(:placeholder-shown) ~ .m3-label {
+            top: 6px; font-size: 0.75rem; color: #0b57d0; font-weight: 500;
         }
 
         /* Checkbox */
@@ -92,105 +83,90 @@
         }
         .m3-checkbox:checked { background-color: #0b57d0; border-color: #0b57d0; }
         .m3-checkbox:checked::before { transform: scale(1); }
-
-        /* Syntax Highlighting */
-        .json-key { color: #9a0036; } .json-string { color: #00600f; } .json-number { color: #1a237e; } .json-boolean { color: #0b57d0; font-weight: bold; }
-
-        /* Scrollbar & Tabs */
+        
+        /* Syntax & Scroll */
+        .json-key { color: #9a0036; } .json-string { color: #00600f; } .json-number { color: #1a237e; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #c4c7c5; border-radius: 4px; }
         .tab-active { background-color: #d3e3fd; color: #041e49; font-weight: 600; }
         .tab-inactive { background-color: transparent; color: #444746; }
-        .tab-inactive:hover { background-color: #f0f4f9; }
-
-        /* Warning Banner Animation */
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .warning-banner { animation: slideDown 0.3s ease-out; }
+        
+        /* Mobile Nav Active State */
+        .mobile-nav-btn.active { color: #0b57d0; background-color: #e8edfa; }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
 
-    <aside class="w-full md:w-[500px] flex flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg">
-        <div class="p-4 flex items-center justify-between border-b border-gray-100 flex-none">
+<body class="h-dvh w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
+
+    <aside id="panel-editor" class="w-full md:w-[500px] flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg flex">
+        
+        <header class="p-4 flex items-center justify-between border-b border-gray-100 flex-none bg-white z-10">
             <h1 class="text-xl font-normal tracking-tight text-[#444746]">Prompt<span class="font-medium text-md-sys-primary">Builder</span></h1>
-            
             <div class="flex items-center gap-2">
                 <button onclick="toggleLanguage()" class="text-sm font-medium text-md-sys-primary hover:bg-blue-50 px-3 py-1 rounded-full transition border border-blue-100">
                     <span id="lang-display">FR</span> <i class="fas fa-globe ml-1"></i>
                 </button>
-                <button onclick="resetForm()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition" id="btn-reset" title="Effacer tout">
+                <button onclick="resetForm()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition" id="btn-reset" aria-label="Effacer">
                     <i class="fas fa-eraser"></i>
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div class="flex-grow overflow-y-auto p-4 space-y-6">
-            
+        <div class="flex-grow overflow-y-auto p-4 space-y-6 pb-24 md:pb-4">
             <div class="m3-field">
                 <input type="text" id="role" class="m3-input" placeholder=" " oninput="updateOutput()">
-                <label class="m3-label" id="lbl-role">1. Persona (Rôle)</label>
+                <label class="m3-label" id="lbl-role" for="role">1. Persona (Rôle)</label>
             </div>
-
             <div class="m3-field">
                 <textarea id="task" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
-                <label class="m3-label" id="lbl-task">2. Tâche (Mission)</label>
+                <label class="m3-label" id="lbl-task" for="task">2. Tâche (Mission)</label>
             </div>
-
             <div class="m3-field">
                 <textarea id="context" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
-                <label class="m3-label" id="lbl-context">3. Contexte</label>
+                <label class="m3-label" id="lbl-context" for="context">3. Contexte</label>
             </div>
 
             <div class="space-y-3">
                 <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-format">4. Format & Contraintes</h3>
-                
                 <div class="grid grid-cols-2 gap-3">
                     <div class="m3-field rounded-t-lg">
-                        <select id="tone" class="m3-input pt-6 bg-transparent" onchange="updateOutput()">
-                            </select>
-                        <label class="m3-label" id="lbl-tone">Ton</label>
+                        <select id="tone" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select>
+                        <label class="m3-label" id="lbl-tone" for="tone">Ton</label>
                         <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
                     </div>
-
                     <div class="m3-field rounded-t-lg">
-                        <select id="format" class="m3-input pt-6 bg-transparent" onchange="updateOutput()">
-                            </select>
-                        <label class="m3-label" id="lbl-format">Format</label>
+                        <select id="format" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select>
+                        <label class="m3-label" id="lbl-format" for="format">Format</label>
                         <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
                     </div>
                 </div>
-
                 <div class="m3-field">
                     <input type="text" id="constraints" class="m3-input" placeholder=" " oninput="updateOutput()">
-                    <label class="m3-label" id="lbl-constraints">Autres contraintes</label>
+                    <label class="m3-label" id="lbl-constraints" for="constraints">Autres contraintes</label>
                 </div>
             </div>
 
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-files">5. Pièces jointes</h3>
-                <div class="border border-dashed border-[#747775] rounded-xl p-4 bg-white hover:bg-md-sys-surface transition cursor-pointer relative" id="drop-zone">
+                <div class="border border-dashed border-[#747775] rounded-xl p-4 bg-white relative" id="drop-zone">
                     <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple onchange="handleFiles(this.files)">
-                    <div class="text-center">
+                    <div class="text-center pointer-events-none">
                         <i class="fas fa-cloud-upload-alt text-md-sys-primary text-xl mb-1"></i>
-                        <p class="text-sm text-[#444746]" id="txt-dropzone">Glisser des fichiers ou <span class="text-md-sys-primary font-medium">Parcourir</span></p>
+                        <p class="text-sm text-[#444746]" id="txt-dropzone">Glisser ou <span class="text-md-sys-primary font-medium">Parcourir</span></p>
                     </div>
                 </div>
                 <div id="file-list" class="flex flex-wrap gap-2"></div>
                 <div id="file-warning" class="hidden warning-banner bg-orange-50 border border-orange-200 rounded-lg p-3 flex gap-3 items-start mt-2">
                     <i class="fas fa-exclamation-triangle text-orange-500 mt-0.5 text-sm"></i>
                     <p class="text-xs text-orange-800 leading-relaxed" id="txt-file-warning">
-                        Le copier-coller ne transfère pas les fichiers. 
-                        <strong>Vous devrez glisser-déposer ces fichiers manuellement dans Gemini.</strong>
+                        Le copier-coller ne transfère pas les fichiers.
                     </p>
                 </div>
             </div>
 
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-instructions">6. Instructions spécifiques</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-instructions">6. Instructions</h3>
                     <button onclick="addInstruction()" class="text-md-sys-primary hover:bg-blue-50 w-6 h-6 rounded-full flex items-center justify-center transition"><i class="fas fa-plus text-xs"></i></button>
                 </div>
                 <div id="instructions-container" class="space-y-2"></div>
@@ -204,26 +180,32 @@
                 <p class="text-xs text-gray-400 pl-8" id="txt-feedback-help">Demande à l'IA de poser des questions de clarification avant de répondre.</p>
             </div>
 
+            <div class="md:hidden pt-8 pb-4 text-center border-t border-gray-100 mt-4">
+                <p class="text-xs text-gray-500 mb-2"><span class="lbl-developed-mobile">Développé par</span> <strong>Fabrice Faucheux</strong></p>
+                <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
+                    <i class="fab fa-paypal"></i> <span class="lbl-tip-mobile">M'offrir un pourboire</span>
+                </a>
+            </div>
+
         </div>
 
-        <div class="flex-none p-4 border-t border-gray-200 bg-gray-50 text-center">
-            <p class="text-xs text-gray-500 mb-2">
-                <span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong>
-            </p>
-            <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
+        <footer class="hidden md:block flex-none p-4 border-t border-gray-200 bg-gray-50 text-center">
+             <p class="text-xs text-gray-500 mb-2"><span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong></p>
+             <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
                 <i class="fab fa-paypal"></i> <span id="lbl-tip">M'offrir un pourboire</span>
             </a>
-        </div>
+        </footer>
     </aside>
 
-    <main class="flex-grow flex flex-col h-full bg-md-sys-surface overflow-hidden relative">
+
+    <main id="panel-preview" class="hidden md:flex flex-grow flex-col h-full bg-md-sys-surface overflow-hidden relative pb-20 md:pb-0">
         
-        <div class="flex-none px-6 pt-6 pb-2 flex justify-between items-end">
+        <div class="flex-none px-4 pt-4 pb-2 flex justify-between items-end flex-wrap gap-2">
             <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
-                <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-active px-6 py-2 rounded-full text-sm transition-all duration-200 flex items-center gap-2">
+                <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2">
                     <i class="fab fa-markdown"></i> <span id="lbl-preview">Aperçu</span>
                 </button>
-                <button onclick="switchTab('json')" id="tab-btn-json" class="tab-inactive px-6 py-2 rounded-full text-sm transition-all duration-200 flex items-center gap-2">
+                <button onclick="switchTab('json')" id="tab-btn-json" class="tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2">
                     <i class="fas fa-code"></i> JSON
                 </button>
             </div>
@@ -234,114 +216,91 @@
             </button>
         </div>
 
-        <div class="flex-grow p-6 overflow-hidden">
+        <div class="flex-grow p-4 overflow-hidden">
             <div class="h-full w-full bg-white rounded-3xl border border-white shadow-sm overflow-hidden flex flex-col relative">
                 
-                <div id="view-markdown" class="p-8 overflow-y-auto h-full prose prose-slate max-w-none font-sans text-gray-700">
+                <div id="view-markdown" class="p-6 md:p-8 overflow-y-auto h-full prose prose-slate max-w-none font-sans text-gray-700 text-sm md:text-base">
                     <div class="flex items-center gap-2 text-gray-400 mb-4 opacity-50 select-none">
-                        <i class="fas fa-sparkles"></i> <span id="lbl-generated">Aperçu généré (Langage Naturel)</span>
+                        <i class="fas fa-sparkles"></i> <span id="lbl-generated">Aperçu généré</span>
                     </div>
                     <div id="markdown-content" class="whitespace-pre-wrap leading-relaxed"></div>
                 </div>
 
                 <div id="view-json" class="hidden p-0 h-full bg-[#1e1e1e] overflow-auto">
-                    <pre class="p-6 text-sm font-mono leading-relaxed text-[#e0e0e0]"><code id="json-content"></code></pre>
+                    <pre class="p-6 text-xs md:text-sm font-mono leading-relaxed text-[#e0e0e0]"><code id="json-content"></code></pre>
                 </div>
 
             </div>
         </div>
-
     </main>
 
-    <div id="toast" class="fixed bottom-6 right-6 bg-[#323232] text-white px-4 py-3 rounded shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3">
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around p-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <button onclick="showMobileTab('editor')" id="nav-btn-editor" class="mobile-nav-btn active flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500">
+            <i class="fas fa-pen"></i>
+            <span class="text-xs font-medium" id="lbl-nav-edit">Éditer</span>
+        </button>
+        <div class="w-px bg-gray-200 my-1"></div>
+        <button onclick="showMobileTab('preview')" id="nav-btn-preview" class="mobile-nav-btn flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500">
+            <i class="fas fa-eye"></i>
+            <span class="text-xs font-medium" id="lbl-nav-view">Résultat</span>
+        </button>
+    </nav>
+
+
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-[#323232] text-white px-4 py-3 rounded shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-[60] flex items-center gap-3 w-max">
         <i class="fas fa-check-circle text-green-400"></i>
-        <span id="txt-toast">Copié dans le presse-papier</span>
+        <span id="txt-toast">Copié !</span>
     </div>
 
     <script>
-        // --- TRANSLATIONS DATA ---
+        // --- TRANSLATIONS ---
         const translations = {
             fr: {
-                // UI Labels
-                lbl_role: "1. Persona (Rôle)",
-                ph_role: "Ex: Chef de projet Google Cloud, Expert Marketing...",
-                lbl_task: "2. Tâche (Mission)",
-                ph_task: "Ex: Rédiger un email de résumé exécutif...",
-                lbl_context: "3. Contexte",
-                ph_context: "Ex: Basé sur les docs du programme, Cible : Cadres...",
-                lbl_header_format: "4. Format & Contraintes",
-                lbl_tone: "Ton",
-                lbl_format: "Format",
-                lbl_constraints: "Autres contraintes",
-                ph_constraints: "Ex: Moins de 200 mots, structure stricte...",
-                lbl_header_files: "5. Pièces jointes",
-                txt_dropzone: "Glisser des fichiers ou <span class='text-md-sys-primary font-medium'>Parcourir</span>",
-                txt_file_warning: "Le copier-coller ne transfère pas les fichiers. <strong>Vous devrez glisser-déposer ces fichiers manuellement dans Gemini.</strong>",
-                lbl_header_instructions: "6. Instructions spécifiques",
-                lbl_feedback: "Activer la boucle de feedback",
+                lbl_role: "1. Persona (Rôle)", ph_role: "Ex: Expert Marketing...",
+                lbl_task: "2. Tâche (Mission)", ph_task: "Ex: Rédiger un email...",
+                lbl_context: "3. Contexte", ph_context: "Contexte du projet...",
+                lbl_header_format: "4. Format & Contraintes", lbl_tone: "Ton", lbl_format: "Format",
+                lbl_constraints: "Autres contraintes", ph_constraints: "Ex: Court, concis...",
+                lbl_header_files: "5. Pièces jointes", txt_dropzone: "Glisser ou <span class='text-md-sys-primary'>Parcourir</span>",
+                txt_file_warning: "Le copier-coller ne transfère pas les fichiers.",
+                lbl_header_instructions: "6. Instructions", 
+                lbl_feedback: "Activer la boucle de feedback", 
                 txt_feedback_help: "Demande à l'IA de poser des questions de clarification avant de répondre.",
-                lbl_preview: "Aperçu",
-                lbl_generated: "Aperçu généré (Langage Naturel)",
-                btn_copy: "Copier",
-                txt_toast: "Copié dans le presse-papier",
-                // Footer
-                lbl_developed: "Développé par",
-                lbl_tip: "M'offrir un pourboire",
-                
-                // Prompt Generation Template
-                prompt_you_are: "Tu es un",
-                prompt_task: "Ta mission est de :",
-                prompt_context: "Contexte :",
-                prompt_tone: "Adopte un ton",
-                prompt_format: "Le format de sortie doit être :",
-                prompt_constraints: "Contraintes à respecter :",
-                prompt_files: "Utilise les informations contenues dans les fichiers joints (que je vais uploader) pour ta réponse :",
-                prompt_file_item: "[Fichier : ",
-                prompt_instructions: "Instructions supplémentaires :",
-                prompt_feedback: "\n---\n**IMPORTANT :** Avant de générer la réponse finale, pose-moi des questions si tu as besoin de précisions ou de contexte supplémentaire pour fournir le meilleur résultat possible."
+                lbl_preview: "Aperçu", lbl_generated: "Aperçu généré", btn_copy: "Copier", txt_toast: "Copié !",
+                lbl_developed: "Développé par", lbl_tip: "M'offrir un pourboire",
+                // Mobile Nav
+                lbl_nav_edit: "Éditer", lbl_nav_view: "Résultat",
+                // Prompt Strings
+                prompt_you_are: "Tu es un", prompt_task: "Ta mission est de :", prompt_context: "Contexte :",
+                prompt_tone: "Ton :", prompt_format: "Format :", prompt_constraints: "Contraintes :",
+                prompt_files: "Fichiers joints :", prompt_file_item: "[Fichier : ", prompt_instructions: "Instructions :",
+                prompt_feedback: "\n\n---\n**IMPORTANT :** Avant de générer la réponse finale, pose-moi des questions si tu as besoin de précisions ou de contexte supplémentaire."
             },
             en: {
-                // UI Labels
-                lbl_role: "1. Persona (Role)",
-                ph_role: "Ex: Google Cloud Project Manager, Marketing Expert...",
-                lbl_task: "2. Task (Mission)",
-                ph_task: "Ex: Draft an executive summary email...",
-                lbl_context: "3. Context",
-                ph_context: "Ex: Based on program docs, Target: Executives...",
-                lbl_header_format: "4. Format & Constraints",
-                lbl_tone: "Tone",
-                lbl_format: "Format",
-                lbl_constraints: "Other Constraints",
-                ph_constraints: "Ex: Less than 200 words, strict structure...",
-                lbl_header_files: "5. Attachments",
-                txt_dropzone: "Drag files or <span class='text-md-sys-primary font-medium'>Browse</span>",
-                txt_file_warning: "Copy/paste does not transfer files. <strong>You must manually drag and drop these files into Gemini.</strong>",
-                lbl_header_instructions: "6. Specific Instructions",
+                lbl_role: "1. Persona (Role)", ph_role: "Ex: Marketing Expert...",
+                lbl_task: "2. Task (Mission)", ph_task: "Ex: Write an email...",
+                lbl_context: "3. Context", ph_context: "Project context...",
+                lbl_header_format: "4. Format & Constraints", lbl_tone: "Tone", lbl_format: "Format",
+                lbl_constraints: "Other Constraints", ph_constraints: "Ex: Short, concise...",
+                lbl_header_files: "5. Attachments", txt_dropzone: "Drag or <span class='text-md-sys-primary'>Browse</span>",
+                txt_file_warning: "Copy/paste doesn't transfer files.",
+                lbl_header_instructions: "6. Instructions", 
                 lbl_feedback: "Enable Feedback Loop",
                 txt_feedback_help: "Ask the AI to ask clarifying questions before answering.",
-                lbl_preview: "Preview",
-                lbl_generated: "Generated Preview (Natural Language)",
-                btn_copy: "Copy",
-                txt_toast: "Copied to clipboard",
-                // Footer
-                lbl_developed: "Developed by",
-                lbl_tip: "Leave a tip",
-
-                // Prompt Generation Template
-                prompt_you_are: "You are a",
-                prompt_task: "Your task is to:",
-                prompt_context: "Context:",
-                prompt_tone: "Adopt a tone that is",
-                prompt_format: "The output format must be:",
-                prompt_constraints: "Constraints to follow:",
-                prompt_files: "Use the information contained in the attached files (which I will upload) for your response:",
-                prompt_file_item: "[File: ",
-                prompt_instructions: "Additional Instructions:",
-                prompt_feedback: "\n---\n**IMPORTANT:** Before generating the final response, ask me questions if you need clarification or additional context to provide the best possible output."
+                lbl_preview: "Preview", lbl_generated: "Generated Preview", btn_copy: "Copy", txt_toast: "Copied!",
+                lbl_developed: "Developed by", lbl_tip: "Leave a tip",
+                // Mobile Nav
+                lbl_nav_edit: "Edit", lbl_nav_view: "Result",
+                // Prompt Strings
+                prompt_you_are: "You are a", prompt_task: "Your task is to:", prompt_context: "Context:",
+                prompt_tone: "Tone:", prompt_format: "Format:", prompt_constraints: "Constraints:",
+                prompt_files: "Attachments:", prompt_file_item: "[File: ", prompt_instructions: "Instructions:",
+                prompt_feedback: "\n\n---\n**IMPORTANT:** Before generating the final response, ask me questions if you need clarification or additional context."
             }
         };
 
-        // Option Data
+        // --- FULL OPTIONS RESTORED ---
         const toneOptions = [
             { key: "", fr: "Par défaut", en: "Default" },
             { key: "professional", fr: "Professionnel & Neutre", en: "Professional & Neutral" },
@@ -371,94 +330,82 @@
             { key: "json", fr: "JSON", en: "JSON" }
         ];
 
-        // --- STATE ---
-        let state = {
-            lang: 'fr',
-            role: "",
-            task: "",
-            context: "",
-            toneKey: "",
-            formatKey: "",
-            constraints: "",
-            feedbackLoop: false,
-            files: [],
-            instructions: [""]
-        };
-        
+        let state = { lang: 'fr', role: "", task: "", context: "", toneKey: "", formatKey: "", constraints: "", feedbackLoop: false, files: [], instructions: [""] };
         let currentTab = 'markdown';
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 0);
+            if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+            const browserLang = navigator.language || navigator.userLanguage; 
+            if (browserLang.startsWith('en')) state.lang = 'en';
+
             renderOptions();
             applyLanguage();
-            renderInstructions();
+            addInstruction();
             updateOutput();
         });
 
-        // --- LANGUAGE LOGIC ---
+        function showMobileTab(viewName) {
+            const editorPanel = document.getElementById('panel-editor');
+            const previewPanel = document.getElementById('panel-preview');
+            const btnEditor = document.getElementById('nav-btn-editor');
+            const btnPreview = document.getElementById('nav-btn-preview');
+
+            if (viewName === 'editor') {
+                editorPanel.classList.remove('hidden'); editorPanel.classList.add('flex');
+                previewPanel.classList.add('hidden'); previewPanel.classList.remove('flex');
+                btnEditor.classList.add('active'); btnPreview.classList.remove('active');
+            } else {
+                editorPanel.classList.add('hidden'); editorPanel.classList.remove('flex');
+                previewPanel.classList.remove('hidden'); previewPanel.classList.add('flex');
+                btnEditor.classList.remove('active'); btnPreview.classList.add('active');
+            }
+        }
+
         function toggleLanguage() {
             state.lang = state.lang === 'fr' ? 'en' : 'fr';
-            applyLanguage();
-            renderOptions(); 
-            updateOutput();
+            applyLanguage(); renderOptions(); updateOutput();
         }
 
         function applyLanguage() {
             const t = translations[state.lang];
-            
             document.getElementById('lang-display').innerText = state.lang.toUpperCase();
+            
+            const map = {
+                'lbl-role': 'lbl_role', 'lbl-task': 'lbl_task', 'lbl-context': 'lbl_context',
+                'lbl-header-format': 'lbl_header_format', 'lbl-tone': 'lbl_tone', 'lbl-format': 'lbl_format',
+                'lbl-constraints': 'lbl_constraints', 'lbl-header-files': 'lbl_header_files',
+                'lbl-header-instructions': 'lbl_header_instructions', 'lbl-feedback': 'lbl_feedback',
+                'txt-feedback-help': 'txt_feedback_help',
+                'lbl-preview': 'lbl_preview', 'copy-btn-text': 'btn_copy', 'lbl-generated': 'lbl_generated',
+                'txt-toast': 'txt_toast', 'lbl-nav-edit': 'lbl_nav_edit', 'lbl-nav-view': 'lbl_nav_view',
+                'lbl-developed': 'lbl_developed', 'lbl-tip': 'lbl_tip'
+            };
 
-            document.getElementById('lbl-role').innerText = t.lbl_role;
+            for (const [id, key] of Object.entries(map)) {
+                const el = document.getElementById(id);
+                if(el && t[key]) el.innerText = t[key];
+            }
+            
+            // Mobile Specific labels
+            document.querySelectorAll('.lbl-developed-mobile').forEach(e => e.innerText = t.lbl_developed);
+            document.querySelectorAll('.lbl-tip-mobile').forEach(e => e.innerText = t.lbl_tip);
+
             document.getElementById('role').placeholder = t.ph_role;
-            
-            document.getElementById('lbl-task').innerText = t.lbl_task;
             document.getElementById('task').placeholder = t.ph_task;
-            
-            document.getElementById('lbl-context').innerText = t.lbl_context;
             document.getElementById('context').placeholder = t.ph_context;
-
-            document.getElementById('lbl-header-format').innerText = t.lbl_header_format;
-            document.getElementById('lbl-tone').innerText = t.lbl_tone;
-            document.getElementById('lbl-format').innerText = t.lbl_format;
-            
-            document.getElementById('lbl-constraints').innerText = t.lbl_constraints;
             document.getElementById('constraints').placeholder = t.ph_constraints;
-
-            document.getElementById('lbl-header-files').innerText = t.lbl_header_files;
             document.getElementById('txt-dropzone').innerHTML = t.txt_dropzone;
             document.getElementById('txt-file-warning').innerHTML = t.txt_file_warning;
-
-            document.getElementById('lbl-header-instructions').innerText = t.lbl_header_instructions;
-            document.getElementById('lbl-feedback').innerText = t.lbl_feedback;
-            document.getElementById('txt-feedback-help').innerText = t.txt_feedback_help;
-
-            document.getElementById('lbl-preview').innerText = t.lbl_preview;
-            document.getElementById('copy-btn-text').innerText = t.btn_copy;
-            document.getElementById('lbl-generated').innerText = t.lbl_generated;
-            document.getElementById('txt-toast').innerText = t.txt_toast;
-
-            // Footer
-            document.getElementById('lbl-developed').innerText = t.lbl_developed;
-            document.getElementById('lbl-tip').innerText = t.lbl_tip;
         }
 
         function renderOptions() {
-            const currentTone = document.getElementById('tone').value;
-            const currentFormat = document.getElementById('format').value;
-
-            const toneSelect = document.getElementById('tone');
-            toneSelect.innerHTML = toneOptions.map(opt => 
-                `<option value="${opt.key}" ${state.toneKey === opt.key ? 'selected' : ''}>${opt[state.lang]}</option>`
-            ).join('');
-
-            const formatSelect = document.getElementById('format');
-            formatSelect.innerHTML = formatOptions.map(opt => 
-                `<option value="${opt.key}" ${state.formatKey === opt.key ? 'selected' : ''}>${opt[state.lang]}</option>`
-            ).join('');
+            document.getElementById('tone').innerHTML = toneOptions.map(o => `<option value="${o.key}" ${state.toneKey === o.key ? 'selected' : ''}>${o[state.lang]}</option>`).join('');
+            document.getElementById('format').innerHTML = formatOptions.map(o => `<option value="${o.key}" ${state.formatKey === o.key ? 'selected' : ''}>${o[state.lang]}</option>`).join('');
         }
 
-        // --- CORE LOGIC ---
-        function updateStateFromDOM() {
+        function updateOutput() {
             state.role = document.getElementById('role').value;
             state.task = document.getElementById('task').value;
             state.context = document.getElementById('context').value;
@@ -469,176 +416,98 @@
             
             const inputs = document.querySelectorAll('#instructions-container input');
             state.instructions = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== "");
-        }
 
-        function updateOutput() {
-            updateStateFromDOM();
-            
-            // Check files for warning
-            const warningEl = document.getElementById('file-warning');
-            if (state.files.length > 0) {
-                warningEl.classList.remove('hidden');
-            } else {
-                warningEl.classList.add('hidden');
-            }
+            const hasFiles = state.files.length > 0;
+            document.getElementById('file-warning').classList.toggle('hidden', !hasFiles);
 
-            // Update Markdown View
             const md = generateMarkdown();
-            const emptyText = state.lang === 'fr' ? "Remplissez le formulaire..." : "Fill in the form...";
-            document.getElementById('markdown-content').innerHTML = md || `<p class="text-gray-400 italic">${emptyText}</p>`;
-
-            // Update JSON View
+            document.getElementById('markdown-content').innerText = md;
+            
             const json = generateJSON();
             document.getElementById('json-content').innerHTML = syntaxHighlight(JSON.stringify(json, null, 2));
         }
 
         function generateMarkdown() {
             const t = translations[state.lang];
-            let prompt = "";
+            let parts = [];
+            if(state.role) parts.push(`${t.prompt_you_are} **${state.role}**.`);
+            if(state.task) parts.push(`${t.prompt_task} ${state.task}`);
+            if(state.context) parts.push(`**${t.prompt_context}** ${state.context}`);
             
-            if (state.role) prompt += `${t.prompt_you_are} **${state.role.trim()}**. `;
-            if (state.task) {
-                let taskText = state.task.trim();
-                if (!/[.!?]$/.test(taskText)) taskText += ".";
-                prompt += `${t.prompt_task} ${taskText}\n\n`;
-            }
-            if (state.context) prompt += `**${t.prompt_context}** ${state.context.trim()}\n\n`;
+            if(state.toneKey) parts.push(`${t.prompt_tone} ${toneOptions.find(o=>o.key===state.toneKey)[state.lang]}.`);
+            if(state.formatKey) parts.push(`${t.prompt_format} ${formatOptions.find(o=>o.key===state.formatKey)[state.lang]}.`);
+            if(state.constraints) parts.push(`${t.prompt_constraints} ${state.constraints}.`);
             
-            let details = [];
-            if (state.toneKey) {
-                const toneObj = toneOptions.find(o => o.key === state.toneKey);
-                const toneText = toneObj ? toneObj[state.lang] : state.toneKey;
-                details.push(`${t.prompt_tone} **${toneText}**.`);
+            if(state.files.length) {
+                parts.push(`\n${t.prompt_files}`);
+                state.files.forEach(f => parts.push(`- ${t.prompt_file_item}${f.name}]`));
             }
-            if (state.formatKey) {
-                const formatObj = formatOptions.find(o => o.key === state.formatKey);
-                const formatText = formatObj ? formatObj[state.lang] : state.formatKey;
-                details.push(`${t.prompt_format} **${formatText}**.`);
+            if(state.instructions.length && state.instructions[0]) {
+                parts.push(`\n**${t.prompt_instructions}**`);
+                state.instructions.forEach(i => parts.push(`- ${i}`));
             }
-            if (state.constraints) details.push(`${t.prompt_constraints} ${state.constraints}.`);
+            if(state.feedbackLoop) parts.push(t.prompt_feedback);
 
-            if (details.length > 0) prompt += details.join(" ") + "\n\n";
-
-            if (state.files.length > 0) {
-                prompt += `${t.prompt_files}\n`;
-                state.files.forEach(f => prompt += `- ${t.prompt_file_item}${f.name}]\n`);
-                prompt += `\n`;
-            }
-
-            if (state.instructions.length > 0 && state.instructions[0] !== "") {
-                prompt += `**${t.prompt_instructions}**\n`;
-                state.instructions.forEach(i => prompt += `- ${i}\n`);
-                prompt += `\n`;
-            }
-
-            if (state.feedbackLoop) prompt += t.prompt_feedback;
-
-            return prompt;
+            return parts.join('\n\n');
         }
 
         function generateJSON() {
             return {
-                meta: { language: state.lang },
-                role: state.role,
-                task: state.task,
-                context: state.context,
-                parameters: {
-                    tone: state.toneKey,
-                    format: state.formatKey,
-                    constraints: state.constraints,
-                    interactive_mode: state.feedbackLoop
-                },
-                attachments: state.files.map(f => f.name),
-                instructions: state.instructions
+                meta: { lang: state.lang }, role: state.role, task: state.task, context: state.context,
+                config: { tone: state.toneKey, format: state.formatKey, constraints: state.constraints, feedback: state.feedbackLoop },
+                attachments: state.files.map(f=>f.name), instructions: state.instructions
             };
         }
 
-        // --- UTILS ---
-        function handleFiles(fileList) {
-            state.files = [...state.files, ...Array.from(fileList)];
-            renderFiles();
-            updateOutput();
-        }
+        function handleFiles(files) { state.files = [...state.files, ...Array.from(files)]; renderFiles(); updateOutput(); }
         function renderFiles() {
-            const container = document.getElementById('file-list');
-            container.innerHTML = '';
-            state.files.forEach((f, idx) => {
-                const badge = document.createElement('div');
-                badge.className = 'bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2';
-                badge.innerHTML = `<i class="fas fa-file"></i> ${f.name} <button onclick="removeFile(${idx})" class="hover:text-red-500"><i class="fas fa-times"></i></button>`;
-                container.appendChild(badge);
+            const c = document.getElementById('file-list'); c.innerHTML = '';
+            state.files.forEach((f, i) => {
+                c.innerHTML += `<div class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2"><i class="fas fa-file"></i> ${f.name} <button onclick="removeFile(${i})" class="text-red-500 hover:text-red-700">&times;</button></div>`;
             });
         }
-        function removeFile(index) {
-            state.files.splice(index, 1);
-            renderFiles();
-            updateOutput();
-        }
-        function renderInstructions() {
-            const container = document.getElementById('instructions-container');
-            if(container.children.length === 0) addInstruction();
-        }
+        function removeFile(i) { state.files.splice(i, 1); renderFiles(); updateOutput(); }
+        
         function addInstruction() {
-            const container = document.getElementById('instructions-container');
+            const c = document.getElementById('instructions-container');
             const div = document.createElement('div');
             div.className = 'flex items-center gap-2 animate-[fadeIn_0.2s]';
-            div.innerHTML = `
-                <input type="text" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="..." oninput="updateOutput()">
-                <button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(div);
-            div.querySelector('input').focus();
+            div.innerHTML = `<input type="text" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-500" oninput="updateOutput()"><button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>`;
+            c.appendChild(div);
         }
+
         function switchTab(tab) {
             currentTab = tab;
-            const mdView = document.getElementById('view-markdown');
-            const jsonView = document.getElementById('view-json');
-            const btnMd = document.getElementById('tab-btn-markdown');
-            const btnJson = document.getElementById('tab-btn-json');
-            if (tab === 'markdown') {
-                mdView.classList.remove('hidden'); jsonView.classList.add('hidden');
-                btnMd.className = 'tab-active px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
-                btnJson.className = 'tab-inactive px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
-            } else {
-                mdView.classList.add('hidden'); jsonView.classList.remove('hidden');
-                btnMd.className = 'tab-inactive px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
-                btnJson.className = 'tab-active px-6 py-2 rounded-full text-sm transition-all flex items-center gap-2';
-            }
+            const isMd = tab === 'markdown';
+            document.getElementById('view-markdown').classList.toggle('hidden', !isMd);
+            document.getElementById('view-json').classList.toggle('hidden', isMd);
+            document.getElementById('tab-btn-markdown').className = isMd ? 'tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2' : 'tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2';
+            document.getElementById('tab-btn-json').className = !isMd ? 'tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2' : 'tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2';
             updateOutput();
         }
+
         function copyCurrentContent() {
-            let content = currentTab === 'markdown' ? generateMarkdown() : JSON.stringify(generateJSON(), null, 2);
-            navigator.clipboard.writeText(content).then(() => {
+            const txt = currentTab === 'markdown' ? document.getElementById('markdown-content').innerText : document.getElementById('json-content').innerText;
+            navigator.clipboard.writeText(txt).then(() => {
                 const toast = document.getElementById('toast');
                 toast.classList.remove('opacity-0');
                 setTimeout(() => toast.classList.add('opacity-0'), 2000);
             });
         }
+
         function resetForm() {
-            const confirmMsg = state.lang === 'fr' ? "Tout effacer ?" : "Clear all?";
-            if(confirm(confirmMsg)) {
-                document.querySelectorAll('input, textarea, select').forEach(el => {
-                    if(el.type === 'checkbox') el.checked = false;
-                    else el.value = '';
-                });
-                state.files = [];
-                state.instructions = [""];
-                renderFiles();
-                document.getElementById('instructions-container').innerHTML = '';
-                addInstruction();
-                renderOptions(); 
-                updateOutput();
+            if(confirm(state.lang === 'fr' ? "Tout effacer ?" : "Clear all?")) {
+                document.querySelectorAll('input, textarea, select').forEach(e => { if(e.type==='checkbox') e.checked=false; else e.value=''; });
+                state.files = []; state.instructions = [""];
+                renderFiles(); document.getElementById('instructions-container').innerHTML = ''; addInstruction(); renderOptions(); updateOutput();
             }
         }
+
         function syntaxHighlight(json) {
-            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                var cls = 'json-number';
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) cls = 'json-key';
-                    else cls = 'json-string';
-                } else if (/true|false/.test(match)) cls = 'json-boolean';
-                else if (/null/.test(match)) cls = 'text-gray-500';
+                let cls = 'json-number';
+                if (/^"/.test(match)) cls = /:$/.test(match) ? 'json-key' : 'json-string';
+                else if (/true|false/.test(match)) cls = 'json-boolean';
                 return '<span class="' + cls + '">' + match + '</span>';
             });
         }
