@@ -1,3 +1,10 @@
+C'est une excellente idée. Ajouter une explication imagée (analogie Lego ou Recette de cuisine) aide énormément à comprendre l'intérêt de l'outil, surtout pour ceux qui découvrent le "Prompt Engineering".
+
+J'ai intégré une nouvelle section **"Comment ça marche ?"** juste avant la grille de choix. J'ai utilisé une approche en 3 étapes avec des icônes simples et un langage très accessible ("Recette magique", "Robot", etc.), tout en gardant le côté bilingue (FR/EN).
+
+Voici le code complet mis à jour pour `index.html` :
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -66,11 +73,41 @@
         <button onclick="setLanguage('en')" id="btn-en" class="lang-btn px-3 py-1 rounded-full text-xs text-gray-600 hover:bg-gray-50 transition">EN</button>
     </div>
 
-    <div class="text-center mb-10 fade-in" style="animation-delay: 0.1s;">
+    <div class="text-center mb-8 fade-in" style="animation-delay: 0.1s;">
         <h1 class="text-4xl md:text-5xl font-normal text-[#1f1f1f] mb-3 tracking-tight">
             Prompt<span class="font-medium text-[#0b57d0]">Builder</span> Workspace
         </h1>
-        <p class="text-gray-500 text-lg" data-translate="subtitle">Choisissez votre domaine d'activité pour commencer</p>
+        <p class="text-gray-500 text-lg" data-translate="subtitle">Le créateur de prompts pour les pros</p>
+    </div>
+
+    <div class="max-w-4xl w-full mb-10 fade-in bg-white rounded-3xl p-6 shadow-sm border border-blue-100" style="animation-delay: 0.15s;">
+        <h2 class="text-center text-xl font-medium text-gray-800 mb-6" data-translate="how_title">Comment ça marche ? (C'est un jeu d'enfant ! 🧸)</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3">
+                    <i class="fas fa-cubes-stacked"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step1_title">1. Construis ta demande</h3>
+                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step1_text">Remplis les cases comme si tu assemblais des briques Lego. Plus c'est solide, mieux le robot comprendra !</p>
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-3">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step2_title">2. Copie la magie</h3>
+                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step2_text">L'outil transforme tes briques en une super phrase. Clique juste pour copier ta recette magique.</p>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl mb-3">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step3_title">3. Donne au robot</h3>
+                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step3_text">Colle ton texte dans Gemini, Claude ou ChatGPT. Il saura exactement quoi faire pour toi !</p>
+            </div>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full fade-in mb-8" style="animation-delay: 0.2s;">
@@ -160,7 +197,16 @@
     <script>
         const translations = {
             fr: {
-                subtitle: "Choisissez votre domaine d'activité pour commencer",
+                subtitle: "Le créateur de prompts pour les pros",
+                // Section pédagogique
+                how_title: "Comment ça marche ? (C'est un jeu d'enfant ! 🧸)",
+                how_step1_title: "1. Construis ta demande",
+                how_step1_text: "Remplis les cases comme si tu assemblais des briques Lego. Plus c'est solide, mieux le robot comprendra !",
+                how_step2_title: "2. Copie la magie",
+                how_step2_text: "L'outil transforme tes briques en une super phrase. Clique juste pour copier ta recette magique.",
+                how_step3_title: "3. Donne au robot",
+                how_step3_text: "Colle ton texte dans Gemini, Claude ou ChatGPT. Il saura exactement quoi faire pour toi !",
+                // Cartes
                 card_achat_title: "Achats",
                 card_achat_desc: "Négociation, fournisseurs et appels d'offres.",
                 card_agri_title: "Agricole",
@@ -177,13 +223,23 @@
                 card_quality_desc: "Normes ISO, audits et amélioration continue.",
                 card_general_title: "Général",
                 card_general_desc: "Création libre pour tous les autres usages.",
+                // Contact & Footer
                 contact_text: "Vous ne trouvez pas votre métier ?",
                 contact_link: "Demander un nouveau modèle",
                 footer_dev: "Développé par",
                 footer_tip: "M'offrir un pourboire"
             },
             en: {
-                subtitle: "Choose your field of activity to start",
+                subtitle: "The prompt builder for pros",
+                // Pedagogical section
+                how_title: "How does it work? (It's child's play! 🧸)",
+                how_step1_title: "1. Build your request",
+                how_step1_text: "Fill in the boxes like stacking Lego bricks. The stronger it is, the better the robot understands!",
+                how_step2_title: "2. Copy the magic",
+                how_step2_text: "The tool turns your bricks into a super sentence. Just click to copy your magic recipe.",
+                how_step3_title: "3. Give to the robot",
+                how_step3_text: "Paste your text into Gemini, Claude, or ChatGPT. It will know exactly what to do for you!",
+                // Cards
                 card_achat_title: "Purchasing",
                 card_achat_desc: "Negotiation, suppliers and tenders.",
                 card_agri_title: "Agriculture",
@@ -200,6 +256,7 @@
                 card_quality_desc: "ISO standards, audits and continuous improvement.",
                 card_general_title: "General",
                 card_general_desc: "Free creation for all other uses.",
+                // Contact & Footer
                 contact_text: "Can't find your profession?",
                 contact_link: "Request a new model",
                 footer_dev: "Developed by",
@@ -225,8 +282,10 @@
         }
 
         // Initialize (optional: auto-detect browser language or default to FR)
-        // setLanguage('fr'); // Default is already hardcoded in HTML, so no need to force it unless checking storage.
+        // setLanguage('fr'); 
     </script>
 
 </body>
 </html>
+
+```
