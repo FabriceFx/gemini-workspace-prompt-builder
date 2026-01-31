@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Générateur de prompts IA pour les métiers de la Qualité et QHSE.">
+    <title>Le Prompt Qualité</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Google Sans Flex"', '"Outfit"', 'sans-serif'],
+                        mono: ['"Roboto Mono"', 'monospace'],
+                    },
+                    colors: {
+                        md: {
+                            sys: {
+                                primary: '#0f766e', /* Teal-700 for Safety/Standard vibe */
+                                surface: '#f0fdfa', /* Teal-50 tint */
+                                on_surface: '#1f1f1f',
+                            }
+                        }
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.2s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Google Sans Flex', 'Outfit', sans-serif; background-color: #f0fdfa; overscroll-behavior-y: none; }
+        .m3-field { position: relative; background-color: #f0fdfa; border-radius: 8px 8px 0 0; border-bottom: 1px solid #747775; transition: all 0.2s; }
+        .m3-field:focus-within { background-color: #ccfbf1; border-bottom: 2px solid #0f766e; }
+        .m3-input { width: 100%; background: transparent; border: none; padding: 24px 16px 8px 16px; outline: none; font-size: 1rem; color: #1f1f1f; line-height: 1.5; font-family: inherit; }
+        .m3-input:not(:focus)::placeholder { opacity: 0; transition: opacity 0.2s; }
+        .m3-label { position: absolute; left: 16px; top: 18px; font-size: 1rem; color: #444746; pointer-events: none; transition: 0.2s ease all; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .m3-input:focus ~ .m3-label, .m3-input:not(:placeholder-shown) ~ .m3-label { top: 6px; font-size: 0.75rem; color: #0f766e; font-weight: 500; }
+        .m3-checkbox-container { display: flex; align-items: center; cursor: pointer; padding: 8px 0; }
+        .m3-checkbox { appearance: none; background-color: #fff; margin: 0; font: inherit; color: currentColor; width: 1.15em; height: 1.15em; border: 2px solid #747775; border-radius: 2px; display: grid; place-content: center; margin-right: 12px; transition: 0.2s all; }
+        .m3-checkbox::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .m3-checkbox:checked { background-color: #0f766e; border-color: #0f766e; }
+        .m3-checkbox:checked::before { transform: scale(1); }
+        .json-key { color: #9a0036; } .json-string { color: #00600f; } .json-number { color: #1a237e; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c4c7c5; border-radius: 4px; }
+        .tab-active { background-color: #ccfbf1; color: #134e4a; font-weight: 600; }
+        .tab-inactive { background-color: transparent; color: #444746; }
+        .mobile-nav-btn.active { color: #0f766e; background-color: #ccfbf1; }
+        .template-select-wrapper { position: relative; max-width: 200px; }
+        .template-select { appearance: none; padding-right: 2rem; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); }
+    </style>
+</head>
+
+<body class="h-dvh w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
+
+    <aside id="panel-editor" class="w-full md:w-[500px] flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg flex">
+        <header class="p-3 md:p-4 flex items-center justify-between border-b border-gray-100 flex-none bg-white z-10 gap-2">
+            <h1 class="text-xl font-normal tracking-tight text-[#444746] hidden sm:block">Le Prompt<span class="font-medium text-md-sys-primary">Qualité</span></h1>
+            <div class="flex items-center gap-2 flex-grow sm:flex-grow-0 justify-end">
+                <div class="template-select-wrapper relative flex-grow sm:flex-grow-0 min-w-[140px]">
+                    <select id="template-selector" onchange="handleTemplateChange(this.value)" class="w-full template-select text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition border border-gray-200 focus:outline-none focus:border-teal-500">
+                        <option value="">✨ Modèles...</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 pointer-events-none"></i>
+                </div>
+                <button onclick="openSaveModal()" class="text-gray-500 hover:text-teal-600 hover:bg-teal-50 p-2 rounded-full transition"><i class="far fa-save"></i></button>
+                <button id="btn-delete-template" onclick="deleteCustomTemplate()" class="hidden text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition"><i class="far fa-trash-alt"></i></button>
+                <div class="h-6 w-px bg-gray-200 mx-1"></div>
+                <button onclick="toggleLanguage()" class="text-sm font-medium text-md-sys-primary hover:bg-teal-50 px-3 py-1 rounded-full transition border border-teal-100 whitespace-nowrap"><span id="lang-display">FR</span></button>
+                <button onclick="resetForm()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition" id="btn-reset"><i class="fas fa-eraser"></i></button>
+            </div>
+        </header>
+
+        <div class="flex-grow overflow-y-auto p-4 space-y-6 pb-24 md:pb-4">
+            <div class="m3-field"><input type="text" id="role" class="m3-input" placeholder=" " oninput="updateOutput()"><label class="m3-label" id="lbl-role" for="role">1. Persona (Rôle)</label></div>
+            <div class="m3-field"><textarea id="task" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea><label class="m3-label" id="lbl-task" for="task">2. Tâche (Mission)</label></div>
+            <div class="m3-field"><textarea id="context" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea><label class="m3-label" id="lbl-context" for="context">3. Contexte</label></div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-format">4. Format & Contraintes</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="m3-field rounded-t-lg"><select id="tone" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select><label class="m3-label" id="lbl-tone" for="tone">Ton</label><i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i></div>
+                    <div class="m3-field rounded-t-lg"><select id="format" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select><label class="m3-label" id="lbl-format" for="format">Format</label><i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i></div>
+                </div>
+                <div class="m3-field"><input type="text" id="constraints" class="m3-input" placeholder=" " oninput="updateOutput()"><label class="m3-label" id="lbl-constraints" for="constraints">Autres contraintes</label></div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-files">5. Pièces jointes</h3>
+                <div class="border border-dashed border-[#747775] rounded-xl p-4 bg-white relative" id="drop-zone">
+                    <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple onchange="handleFiles(this.files)">
+                    <div class="text-center pointer-events-none"><i class="fas fa-cloud-upload-alt text-md-sys-primary text-xl mb-1"></i><p class="text-sm text-[#444746]" id="txt-dropzone">Glisser ou <span class="text-md-sys-primary font-medium">Parcourir</span></p></div>
+                </div>
+                <div id="file-list" class="flex flex-wrap gap-2"></div>
+                <div id="file-warning" class="hidden warning-banner bg-orange-50 border border-orange-200 rounded-lg p-3 flex gap-3 items-start mt-2"><i class="fas fa-exclamation-triangle text-orange-500 mt-0.5 text-sm"></i><p class="text-xs text-orange-800 leading-relaxed" id="txt-file-warning">Le copier-coller ne transfère pas les fichiers.</p></div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-instructions">6. Instructions</h3><button onclick="addInstruction()" class="text-md-sys-primary hover:bg-teal-50 w-6 h-6 rounded-full flex items-center justify-center transition"><i class="fas fa-plus text-xs"></i></button></div>
+                <div id="instructions-container" class="space-y-2"></div>
+            </div>
+
+            <div class="pt-2 border-t border-gray-100"><label class="m3-checkbox-container"><input type="checkbox" id="feedback-loop" class="m3-checkbox" onchange="updateOutput()"><span class="text-sm text-[#444746] font-medium" id="lbl-feedback">Activer la boucle de feedback</span></label></div>
+
+            <div class="md:hidden pt-8 pb-4 text-center border-t border-gray-100 mt-4">
+                <p class="text-xs text-gray-500 mb-2"><span class="lbl-developed-mobile">Développé par</span> <strong>Fabrice Faucheux</strong></p>
+                <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium"><i class="fab fa-paypal"></i> <span class="lbl-tip-mobile">M'offrir un pourboire</span></a>
+            </div>
+        </div>
+
+        <footer class="hidden md:block flex-none p-4 border-t border-gray-200 bg-gray-50 text-center">
+             <p class="text-xs text-gray-500 mb-2"><span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong></p>
+             <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium"><i class="fab fa-paypal"></i> <span id="lbl-tip">M'offrir un pourboire</span></a>
+        </footer>
+    </aside>
+
+    <main id="panel-preview" class="hidden md:flex flex-grow flex-col h-full bg-md-sys-surface overflow-hidden relative pb-20 md:pb-0">
+        <div class="flex-none px-4 pt-4 pb-2 flex justify-between items-end flex-wrap gap-2">
+            <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2"><i class="fab fa-markdown"></i> <span id="lbl-preview">Aperçu</span></button>
+                <button onclick="switchTab('json')" id="tab-btn-json" class="tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2"><i class="fas fa-code"></i> JSON</button>
+            </div>
+            <button onclick="copyCurrentContent()" class="bg-md-sys-primary hover:bg-teal-700 text-white px-5 py-2.5 rounded-full shadow-elevation-1 transition-all flex items-center gap-2 text-sm font-medium"><i class="far fa-copy"></i><span id="copy-btn-text">Copier</span></button>
+        </div>
+        <div class="flex-grow p-4 overflow-hidden">
+            <div class="h-full w-full bg-white rounded-3xl border border-white shadow-sm overflow-hidden flex flex-col relative">
+                <div id="view-markdown" class="p-6 md:p-8 overflow-y-auto h-full prose prose-slate max-w-none font-sans text-gray-700 text-sm md:text-base">
+                    <div class="flex items-center gap-2 text-gray-400 mb-4 opacity-50 select-none"><i class="fas fa-sparkles"></i> <span id="lbl-generated">Aperçu généré</span></div>
+                    <div id="markdown-content" class="whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+                <div id="view-json" class="hidden p-0 h-full bg-[#1e1e1e] overflow-auto"><pre class="p-6 text-xs md:text-sm font-mono leading-relaxed text-[#e0e0e0]"><code id="json-content"></code></pre></div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around p-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <button onclick="showMobileTab('editor')" id="nav-btn-editor" class="mobile-nav-btn active flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500"><i class="fas fa-pen"></i><span class="text-xs font-medium" id="lbl-nav-edit">Éditer</span></button>
+        <div class="w-px bg-gray-200 my-1"></div>
+        <button onclick="showMobileTab('preview')" id="nav-btn-preview" class="mobile-nav-btn flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500"><i class="fas fa-eye"></i><span class="text-xs font-medium" id="lbl-nav-view">Résultat</span></button>
+    </nav>
+
+    <div id="modal-save" class="modal-backdrop fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-[fadeIn_0.2s]">
+            <h3 class="text-lg font-medium text-gray-800 mb-4" id="lbl-modal-title">Sauvegarder le modèle</h3>
+            <div class="m3-field mb-4 rounded-t-lg bg-gray-50"><input type="text" id="template-name-input" class="m3-input" placeholder=" " autofocus><label class="m3-label">Nom du modèle</label></div>
+            <div class="flex justify-end gap-2"><button onclick="closeSaveModal()" class="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-full transition">Annuler</button><button onclick="confirmSaveTemplate()" class="px-4 py-2 text-sm font-medium bg-md-sys-primary text-white hover:bg-teal-700 rounded-full transition">Sauvegarder</button></div>
+        </div>
+    </div>
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-[#323232] text-white px-4 py-3 rounded shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-[60] flex items-center gap-3 w-max"><i class="fas fa-check-circle text-green-400"></i><span id="txt-toast">Copié !</span></div>
+
+    <script>
+        const translations = {
+            fr: {
+                lbl_role: "1. Persona (Rôle)", ph_role: "Ex: Responsable Qualité, Auditeur...",
+                lbl_task: "2. Tâche (Mission)", ph_task: "Ex: Rédiger une fiche NC...",
+                lbl_context: "3. Contexte", ph_context: "Audit ISO 9001, Réclamation client...",
+                lbl_header_format: "4. Format & Contraintes", lbl_tone: "Ton", lbl_format: "Format",
+                lbl_constraints: "Autres contraintes", ph_constraints: "Ex: Norme ISO, 8D...",
+                lbl_header_files: "5. Pièces jointes", txt_dropzone: "Glisser ou <span class='text-md-sys-primary'>Parcourir</span>",
+                txt_file_warning: "Le copier-coller ne transfère pas les fichiers.",
+                lbl_header_instructions: "6. Instructions", lbl_feedback: "Activer la boucle de feedback", 
+                lbl_preview: "Aperçu", lbl_generated: "Aperçu généré", btn_copy: "Copier", txt_toast: "Copié !",
+                lbl_developed: "Développé par", lbl_tip: "M'offrir un pourboire", lbl_nav_edit: "Éditer", lbl_nav_view: "Résultat",
+                lbl_template_default: "✨ Modèles Qualité...", lbl_group_default: "Modèles Métiers", lbl_group_custom: "Mes modèles", lbl_modal_title: "Sauvegarder le modèle",
+                prompt_you_are: "Tu es un", prompt_task: "Ta mission est de :", prompt_context: "Contexte :", prompt_tone: "Ton :", prompt_format: "Format :", prompt_constraints: "Contraintes :", prompt_files: "Fichiers joints :", prompt_file_item: "[Fichier : ", prompt_instructions: "Instructions :", prompt_feedback: "\n\n---\n**IMPORTANT :** Avant de générer la réponse finale, pose-moi des questions si tu as besoin de précisions ou de contexte supplémentaire."
+            },
+            en: {
+                lbl_role: "1. Persona (Role)", ph_role: "Ex: Quality Manager, Auditor...",
+                lbl_task: "2. Task (Mission)", ph_task: "Ex: Write a NC report...",
+                lbl_context: "3. Context", ph_context: "ISO 9001 Audit, Customer complaint...",
+                lbl_header_format: "4. Format & Constraints", lbl_tone: "Tone", lbl_format: "Format",
+                lbl_constraints: "Other Constraints", ph_constraints: "Ex: ISO Standard, 8D...",
+                lbl_header_files: "5. Attachments", txt_dropzone: "Drag or <span class='text-md-sys-primary'>Browse</span>",
+                txt_file_warning: "Copy/paste doesn't transfer files.",
+                lbl_header_instructions: "6. Instructions", lbl_feedback: "Enable Feedback Loop",
+                lbl_preview: "Preview", lbl_generated: "Generated Preview", btn_copy: "Copy", txt_toast: "Copied!",
+                lbl_developed: "Developed by", lbl_tip: "Leave a tip", lbl_nav_edit: "Edit", lbl_nav_view: "Result",
+                lbl_template_default: "✨ Quality Templates...", lbl_group_default: "Pro Templates", lbl_group_custom: "My Templates", lbl_modal_title: "Save Template",
+                prompt_you_are: "You are a", prompt_task: "Your task is to:", prompt_context: "Context:", prompt_tone: "Tone:", prompt_format: "Format:", prompt_constraints: "Constraints:", prompt_files: "Attachments:", prompt_file_item: "[File: ", prompt_instructions: "Instructions:", prompt_feedback: "\n\n---\n**IMPORTANT:** Before generating the final response, ask me questions if you need clarification or additional context."
+            }
+        };
+
+        const STORAGE_KEY = 'prompt_quality_templates_v1';
+        const defaultTemplates = {
+            nc_report: {
+                fr: { name: "Rapport de non-conformité", role: "Responsable Qualité", task: "Rédiger une fiche de non-conformité suite à un défaut de production.", context: "Lot 1234, défaut dimensionnel détecté au contrôle final.", tone: "factual", format: "table", constraints: "Inclure la méthode 5M ou Ishikawa.", instructions: ["Décrire le défaut factuellement.", "Identifier la cause racine probable.", "Proposer une action curative immédiate."] },
+                en: { name: "Non-Conformity Report", role: "Quality Manager", task: "Write a non-conformity report following a production defect.", context: "Batch 1234, dimensional defect at final check.", tone: "factual", format: "table", constraints: "Include 5M or Ishikawa method.", instructions: ["Describe defect factually.", "Identify probable root cause.", "Propose immediate curative action."] }
+            },
+            audit_checklist: {
+                fr: { name: "Checklist audit interne (ISO)", role: "Auditeur Interne", task: "Générer une checklist d'audit pour le processus RH.", context: "Préparation audit de certification ISO 9001:2015.", tone: "professional", format: "checklist", constraints: "Citer les paragraphes de la norme.", instructions: ["Vérifier la gestion des compétences (7.2).", "Vérifier la sensibilisation (7.3).", "Demander les preuves documentaires."] },
+                en: { name: "Internal Audit Checklist", role: "Internal Auditor", task: "Generate audit checklist for HR process.", context: "ISO 9001:2015 certification prep.", tone: "professional", format: "checklist", constraints: "Cite standard clauses.", instructions: ["Check competence (7.2).", "Check awareness (7.3).", "Ask for documentary evidence."] }
+            },
+            sop_procedure: {
+                fr: { name: "Procédure opérationnelle (SOP)", role: "Ingénieur Méthodes", task: "Rédiger une procédure pour l'utilisation de la machine X.", context: "Nouvel équipement, besoin de standardiser.", tone: "didactic", format: "bullet", constraints: "Pas à pas, clair pour opérateur.", instructions: ["Commencer par les EPI obligatoires.", "Détailler la mise en route.", "Expliquer la procédure d'arrêt d'urgence."] },
+                en: { name: "SOP Procedure", role: "Process Engineer", task: "Write an SOP for using machine X.", context: "New equipment, need standardization.", tone: "didactic", format: "bullet", constraints: "Step-by-step, clear for operator.", instructions: ["Start with required PPE.", "Detail startup.", "Explain emergency stop procedure."] }
+            },
+            root_cause: {
+                fr: { name: "Analyse 5 Pourquoi", role: "Animateur Qualité", task: "Réaliser une analyse 5 Pourquoi sur le problème décrit.", context: "Panne machine récurrente sur la ligne 2.", tone: "analytical", format: "bullet", constraints: "Aller jusqu'à la cause racine systémique.", instructions: ["Ne pas s'arrêter à 'Erreur humaine'.", "Proposer une action corrective durable.", "Valider la cohérence de la chaîne causale."] },
+                en: { name: "5 Whys Analysis", role: "Quality Facilitator", task: "Perform a 5 Whys analysis on the described issue.", context: "Recurring machine breakdown on line 2.", tone: "analytical", format: "bullet", constraints: "Reach systemic root cause.", instructions: ["Don't stop at 'Human error'.", "Propose sustainable corrective action.", "Validate causal chain consistency."] }
+            }
+        };
+
+        const toneOptions = [{key:"",fr:"Par défaut",en:"Default"},{key:"factual",fr:"Factuel & Objectif",en:"Factual & Objective"},{key:"didactic",fr:"Didactique (Procédure)",en:"Didactic (Procedure)"},{key:"analytical",fr:"Analytique (Résolution)",en:"Analytical (Solving)"}];
+        const formatOptions = [{key:"",fr:"Texte libre",en:"Free Text"},{key:"table",fr:"Tableau structuré",en:"Structured Table"},{key:"checklist",fr:"Checklist",en:"Checklist"},{key:"bullet",fr:"Liste à puces",en:"Bullet Points"},{key:"report",fr:"Rapport formel",en:"Formal Report"}];
+
+        let state = { lang: 'fr', role: "", task: "", context: "", toneKey: "", formatKey: "", constraints: "", feedbackLoop: false, files: [], instructions: [""] };
+        let currentTab = 'markdown'; let customTemplates = [];
+
+        document.addEventListener('DOMContentLoaded', () => { window.scrollTo(0,0); const browserLang = navigator.language || navigator.userLanguage; if(browserLang.startsWith('en')) state.lang = 'en'; loadCustomTemplates(); renderOptions(); renderTemplateList(); applyLanguage(); addInstruction(); updateOutput(); });
+
+        function loadCustomTemplates() { try { const stored = localStorage.getItem(STORAGE_KEY); if(stored) customTemplates = JSON.parse(stored); } catch(e){ console.error(e); } }
+        function saveCustomTemplateToStorage() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(customTemplates)); } catch(e){ alert("Erreur stockage local."); } }
+        function openSaveModal() { document.getElementById('modal-save').classList.remove('hidden'); document.getElementById('template-name-input').focus(); }
+        function closeSaveModal() { document.getElementById('modal-save').classList.add('hidden'); document.getElementById('template-name-input').value = ""; }
+        function confirmSaveTemplate() { const name = document.getElementById('template-name-input').value.trim(); if(!name) return; customTemplates.push({ id:'custom_'+Date.now(), name, ...state, instructions:[...state.instructions] }); saveCustomTemplateToStorage(); closeSaveModal(); renderTemplateList(); showToast("Modèle sauvegardé !"); }
+        function deleteCustomTemplate() { if(confirm("Supprimer ?")) { const id = document.getElementById('template-selector').value; customTemplates = customTemplates.filter(t=>t.id!==id); saveCustomTemplateToStorage(); renderTemplateList(); document.getElementById('template-selector').value=""; handleTemplateChange(""); } }
+        function toggleLanguage() { state.lang = state.lang==='fr'?'en':'fr'; applyLanguage(); renderOptions(); renderTemplateList(); updateOutput(); }
+        function applyLanguage() { const t=translations[state.lang]; for(const[id,k] of Object.entries({'lbl-role':'lbl_role','lbl-task':'lbl_task','lbl-context':'lbl_context','lbl-header-format':'lbl_header_format','lbl-tone':'lbl_tone','lbl-format':'lbl_format','lbl-constraints':'lbl_constraints','lbl-header-files':'lbl_header_files','lbl-header-instructions':'lbl_header_instructions','lbl-feedback':'lbl_feedback','lbl-preview':'lbl_preview','copy-btn-text':'btn_copy','lbl-generated':'lbl_generated','txt-toast':'txt_toast','lbl-nav-edit':'lbl_nav_edit','lbl-nav-view':'lbl_nav_view','lbl-developed':'lbl_developed','lbl-modal-title':'lbl_modal_title','lbl-tip':'lbl_tip','lang-display':null})) { if(k) document.getElementById(id).innerText=t[k]; } document.getElementById('lang-display').innerText=state.lang.toUpperCase(); document.querySelectorAll('.lbl-developed-mobile').forEach(e=>e.innerText=t.lbl_developed); document.querySelectorAll('.lbl-tip-mobile').forEach(e=>e.innerText=t.lbl_tip); document.getElementById('role').placeholder=t.ph_role; document.getElementById('task').placeholder=t.ph_task; document.getElementById('context').placeholder=t.ph_context; document.getElementById('constraints').placeholder=t.ph_constraints; document.getElementById('txt-dropzone').innerHTML=t.txt_dropzone; document.getElementById('txt-file-warning').innerHTML=t.txt_file_warning; }
+        function renderOptions() { document.getElementById('tone').innerHTML = toneOptions.map(o => `<option value="${o.key}" ${state.toneKey===o.key?'selected':''}>${o[state.lang]}</option>`).join(''); document.getElementById('format').innerHTML = formatOptions.map(o => `<option value="${o.key}" ${state.formatKey===o.key?'selected':''}>${o[state.lang]}</option>`).join(''); }
+        function renderTemplateList() { const t=translations[state.lang]; const s=document.getElementById('template-selector'); const v=s.value; let h=`<option value="">${t.lbl_template_default}</option><optgroup label="${t.lbl_group_default}">`; for(const k in defaultTemplates) h+=`<option value="${k}">${defaultTemplates[k][state.lang].name}</option>`; h+=`</optgroup>`; if(customTemplates.length) { h+=`<optgroup label="${t.lbl_group_custom}">`; customTemplates.forEach(t=>h+=`<option value="${t.id}">${t.name}</option>`); h+=`</optgroup>`; } s.innerHTML=h; s.value=v; }
+        function handleTemplateChange(k) { const btn=document.getElementById('btn-delete-template'); if(!k){ btn.classList.add('hidden'); return; } let d; if(k.startsWith('custom_')) { d=customTemplates.find(t=>t.id===k); btn.classList.remove('hidden'); } else { d=defaultTemplates[k][state.lang]; d.feedback=false; btn.classList.add('hidden'); } if(!d) return; document.getElementById('role').value=d.role||""; document.getElementById('task').value=d.task||""; document.getElementById('context').value=d.context||""; document.getElementById('constraints').value=d.constraints||""; state.toneKey=d.tone||""; state.formatKey=d.format||""; renderOptions(); document.getElementById('feedback-loop').checked=!!d.feedback; const c=document.getElementById('instructions-container'); c.innerHTML=''; (d.instructions||[]).forEach(i=>createInstructionInput(i)); if(!d.instructions?.length) addInstruction(); updateOutput(); }
+        function createInstructionInput(v="") { const d=document.createElement('div'); d.className='flex items-center gap-2 animate-[fadeIn_0.2s]'; d.innerHTML=`<input type="text" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-teal-500" value="${v}" oninput="updateOutput()"><button onclick="this.parentElement.remove();updateOutput()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>`; document.getElementById('instructions-container').appendChild(d); }
+        function addInstruction() { createInstructionInput(); }
+        function updateOutput() { state.role=document.getElementById('role').value; state.task=document.getElementById('task').value; state.context=document.getElementById('context').value; state.toneKey=document.getElementById('tone').value; state.formatKey=document.getElementById('format').value; state.constraints=document.getElementById('constraints').value; state.feedbackLoop=document.getElementById('feedback-loop').checked; state.instructions=Array.from(document.querySelectorAll('#instructions-container input')).map(i=>i.value).filter(v=>v.trim()); document.getElementById('file-warning').classList.toggle('hidden', !state.files.length); document.getElementById('markdown-content').innerText=generateMarkdown(); document.getElementById('json-content').innerHTML=syntaxHighlight(JSON.stringify({meta:{lang:state.lang},...state,attachments:state.files.map(f=>f.name)},null,2)); }
+        function generateMarkdown() { const t=translations[state.lang]; let p=[]; if(state.role) p.push(`${t.prompt_you_are} **${state.role}**.`); if(state.task) p.push(`${t.prompt_task} ${state.task}`); if(state.context) p.push(`**${t.prompt_context}** ${state.context}`); if(state.toneKey) p.push(`${t.prompt_tone} ${toneOptions.find(o=>o.key===state.toneKey)[state.lang]}.`); if(state.formatKey) p.push(`${t.prompt_format} ${formatOptions.find(o=>o.key===state.formatKey)[state.lang]}.`); if(state.constraints) p.push(`${t.prompt_constraints} ${state.constraints}.`); if(state.files.length) { p.push(`\n${t.prompt_files}`); state.files.forEach(f=>p.push(`- ${t.prompt_file_item}${f.name}]`)); } if(state.instructions.length && state.instructions[0]) { p.push(`\n**${t.prompt_instructions}**`); state.instructions.forEach(i=>p.push(`- ${i}`)); } if(state.feedbackLoop) p.push(t.prompt_feedback); return p.join('\n\n'); }
+        function handleFiles(fs) { state.files=[...state.files,...Array.from(fs)]; renderFiles(); updateOutput(); }
+        function renderFiles() { const c=document.getElementById('file-list'); c.innerHTML=''; state.files.forEach((f,i)=>c.innerHTML+=`<div class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2"><i class="fas fa-file"></i> ${f.name} <button onclick="removeFile(${i})" class="text-red-500 hover:text-red-700">&times;</button></div>`); }
+        function removeFile(i) { state.files.splice(i,1); renderFiles(); updateOutput(); }
+        function switchTab(t) { currentTab=t; const m=t==='markdown'; document.getElementById('view-markdown').classList.toggle('hidden',!m); document.getElementById('view-json').classList.toggle('hidden',m); document.getElementById('tab-btn-markdown').className=m?'tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2':'tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2'; document.getElementById('tab-btn-json').className=!m?'tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2':'tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2'; updateOutput(); }
+        function copyCurrentContent() { const t=currentTab==='markdown'?document.getElementById('markdown-content').innerText:document.getElementById('json-content').innerText; navigator.clipboard.writeText(t).then(()=>showToast(translations[state.lang].txt_toast)); }
+        function showToast(m) { const t=document.getElementById('toast'); document.getElementById('txt-toast').innerText=m; t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'),2000); }
+        function resetForm() { if(confirm(state.lang==='fr'?"Tout effacer ?":"Clear all?")) { document.querySelectorAll('input,textarea,select').forEach(e=>{if(e.type==='checkbox')e.checked=false;else e.value='';}); state.files=[]; state.instructions=[""]; document.getElementById('template-selector').value=""; document.getElementById('btn-delete-template').classList.add('hidden'); renderFiles(); document.getElementById('instructions-container').innerHTML=''; addInstruction(); renderOptions(); updateOutput(); } }
+        function showMobileTab(v) { const e=document.getElementById('panel-editor'), p=document.getElementById('panel-preview'), be=document.getElementById('nav-btn-editor'), bp=document.getElementById('nav-btn-preview'); if(v==='editor'){e.classList.remove('hidden','flex');e.classList.add('flex');p.classList.add('hidden');be.classList.add('active');bp.classList.remove('active');}else{e.classList.add('hidden');p.classList.remove('hidden','flex');p.classList.add('flex');be.classList.remove('active');bp.classList.add('active');} }
+        function syntaxHighlight(j) { return j.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, m=>{ let c='json-number'; if(/^"/.test(m)) c=/:$/.test(m)?'json-key':'json-string'; else if(/true|false/.test(m)) c='json-boolean'; return '<span class="'+c+'">'+m+'</span>'; }); }
+    </script>
+</body>
+</html>
