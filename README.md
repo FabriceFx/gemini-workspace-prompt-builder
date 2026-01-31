@@ -43,7 +43,7 @@ https://fabricefx.github.io/gemini-workspace-prompt-builder/
 
 ---
 
-## 📦 Installation & Usage
+## 📦 Installation & usage
 
 ### 1. Utilisation locale / Local Usage
 Le projet est conçu comme un fichier unique autonome.
@@ -51,15 +51,3 @@ Le projet est conçu comme un fichier unique autonome.
 2. Ouvrez-le directement dans votre navigateur web (Chrome, Firefox, Edge).
 3. Aucune compilation n'est nécessaire (Tailwind est chargé via CDN).
 
-### 2. Google Apps Script (Optionnel)
-Pour déployer cet outil en tant qu'application Web Google Apps Script :
-1. Créez un nouveau projet sur [script.google.com](https://script.google.com).
-2. Créez un fichier HTML nommé `index`.
-3. Collez le contenu de `index.html`.
-4. Ajoutez le code suivant dans `Code.gs` :
-   ```javascript
-   function doGet() {
-     return HtmlService.createHtmlOutputFromFile('index')
-       .setTitle('Prompt Builder')
-       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-   }
