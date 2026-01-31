@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Générateur de prompts IA pour les métiers de la Peinture et de la Décoration.">
+    <title>Le Prompt Peintre / Déco</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Google Sans Flex"', '"Outfit"', 'sans-serif'],
+                        mono: ['"Roboto Mono"', 'monospace'],
+                    },
+                    colors: {
+                        md: {
+                            sys: {
+                                primary: '#be185d', /* Pink-700 for Creativity/Design vibe */
+                                surface: '#fdf2f8', /* Pink-50 tint */
+                                on_surface: '#1f1f1f',
+                            }
+                        }
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        fadeIn: 'fadeIn 0.2s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base & Reset */
+        body { 
+            font-family: 'Google Sans Flex', 'Outfit', sans-serif; 
+            background-color: #fdf2f8; 
+            overscroll-behavior-y: none; 
+        }
+        
+        /* Material 3 Input Style */
+        .m3-field {
+            position: relative;
+            background-color: #fdf2f8;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #747775;
+            transition: all 0.2s;
+        }
+        .m3-field:focus-within { background-color: #fce7f3; border-bottom: 2px solid #be185d; }
+        .m3-input {
+            width: 100%; background: transparent; border: none; padding: 24px 16px 8px 16px;
+            outline: none; font-size: 1rem; color: #1f1f1f; line-height: 1.5;
+            font-family: inherit; 
+        }
+        .m3-input:not(:focus)::placeholder { opacity: 0; transition: opacity 0.2s; }
+        .m3-label {
+            position: absolute; left: 16px; top: 18px; font-size: 1rem; color: #444746;
+            pointer-events: none; transition: 0.2s ease all; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .m3-input:focus ~ .m3-label, .m3-input:not(:placeholder-shown) ~ .m3-label {
+            top: 6px; font-size: 0.75rem; color: #be185d; font-weight: 500;
+        }
+
+        /* Checkbox */
+        .m3-checkbox-container { display: flex; align-items: center; cursor: pointer; padding: 8px 0; }
+        .m3-checkbox {
+            appearance: none; background-color: #fff; margin: 0; font: inherit; color: currentColor;
+            width: 1.15em; height: 1.15em; border: 2px solid #747775; border-radius: 2px;
+            display: grid; place-content: center; margin-right: 12px; transition: 0.2s all;
+        }
+        .m3-checkbox::before {
+            content: ""; width: 0.65em; height: 0.65em; transform: scale(0);
+            transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white;
+            transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .m3-checkbox:checked { background-color: #be185d; border-color: #be185d; }
+        .m3-checkbox:checked::before { transform: scale(1); }
+        
+        /* Syntax & Scroll */
+        .json-key { color: #9a0036; } .json-string { color: #00600f; } .json-number { color: #1a237e; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c4c7c5; border-radius: 4px; }
+        .tab-active { background-color: #fce7f3; color: #831843; font-weight: 600; }
+        .tab-inactive { background-color: transparent; color: #444746; }
+        
+        /* Mobile Nav Active State */
+        .mobile-nav-btn.active { color: #be185d; background-color: #fce7f3; }
+
+        /* Template Select Custom Style */
+        .template-select-wrapper {
+            position: relative;
+            max-width: 200px;
+        }
+        .template-select {
+            appearance: none;
+            padding-right: 2rem;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden; 
+            text-overflow: ellipsis;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+        }
+    </style>
+</head>
+
+<body class="h-dvh w-screen overflow-hidden flex flex-col md:flex-row text-[#1f1f1f]">
+
+    <aside id="panel-editor" class="w-full md:w-[500px] flex-col h-full bg-white border-r border-[#c4c7c5] z-20 shadow-lg flex">
+        
+        <header class="p-3 md:p-4 flex items-center justify-between border-b border-gray-100 flex-none bg-white z-10 gap-2">
+            <h1 class="text-xl font-normal tracking-tight text-[#444746] hidden sm:block">Le Prompt<span class="font-medium text-md-sys-primary">Peintre/Déco</span></h1>
+            
+            <div class="flex items-center gap-2 flex-grow sm:flex-grow-0 justify-end">
+                <div class="template-select-wrapper relative flex-grow sm:flex-grow-0 min-w-[140px]">
+                    <select id="template-selector" onchange="handleTemplateChange(this.value)" class="w-full template-select text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition border border-gray-200 focus:outline-none focus:border-pink-500">
+                        <option value="">✨ Modèles...</option>
+                        </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 pointer-events-none"></i>
+                </div>
+
+                <button onclick="openSaveModal()" class="text-gray-500 hover:text-pink-700 hover:bg-pink-50 p-2 rounded-full transition" title="Sauvegarder ce modèle">
+                    <i class="far fa-save"></i>
+                </button>
+                
+                <button id="btn-delete-template" onclick="deleteCustomTemplate()" class="hidden text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition" title="Supprimer ce modèle">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+
+                <div class="h-6 w-px bg-gray-200 mx-1"></div>
+
+                <button onclick="toggleLanguage()" class="text-sm font-medium text-md-sys-primary hover:bg-pink-50 px-3 py-1 rounded-full transition border border-pink-100 whitespace-nowrap">
+                    <span id="lang-display">FR</span>
+                </button>
+                <button onclick="resetForm()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition" id="btn-reset" aria-label="Effacer">
+                    <i class="fas fa-eraser"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-grow overflow-y-auto p-4 space-y-6 pb-24 md:pb-4">
+            <div class="m3-field">
+                <input type="text" id="role" class="m3-input" placeholder=" " oninput="updateOutput()">
+                <label class="m3-label" id="lbl-role" for="role">1. Persona (Rôle)</label>
+            </div>
+            <div class="m3-field">
+                <textarea id="task" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
+                <label class="m3-label" id="lbl-task" for="task">2. Tâche (Mission)</label>
+            </div>
+            <div class="m3-field">
+                <textarea id="context" rows="3" class="m3-input resize-none" placeholder=" " oninput="updateOutput()"></textarea>
+                <label class="m3-label" id="lbl-context" for="context">3. Contexte</label>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-format">4. Format & Contraintes</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="m3-field rounded-t-lg">
+                        <select id="tone" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select>
+                        <label class="m3-label" id="lbl-tone" for="tone">Ton</label>
+                        <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
+                    </div>
+                    <div class="m3-field rounded-t-lg">
+                        <select id="format" class="m3-input pt-6 bg-transparent" onchange="updateOutput()"></select>
+                        <label class="m3-label" id="lbl-format" for="format">Format</label>
+                        <i class="fas fa-caret-down absolute right-3 top-6 text-gray-500 pointer-events-none"></i>
+                    </div>
+                </div>
+                <div class="m3-field">
+                    <input type="text" id="constraints" class="m3-input" placeholder=" " oninput="updateOutput()">
+                    <label class="m3-label" id="lbl-constraints" for="constraints">Autres contraintes</label>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-files">5. Pièces jointes</h3>
+                <div class="border border-dashed border-[#747775] rounded-xl p-4 bg-white relative" id="drop-zone">
+                    <input type="file" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple onchange="handleFiles(this.files)">
+                    <div class="text-center pointer-events-none">
+                        <i class="fas fa-cloud-upload-alt text-md-sys-primary text-xl mb-1"></i>
+                        <p class="text-sm text-[#444746]" id="txt-dropzone">Glisser ou <span class="text-md-sys-primary font-medium">Parcourir</span></p>
+                    </div>
+                </div>
+                <div id="file-list" class="flex flex-wrap gap-2"></div>
+                <div id="file-warning" class="hidden warning-banner bg-orange-50 border border-orange-200 rounded-lg p-3 flex gap-3 items-start mt-2">
+                    <i class="fas fa-exclamation-triangle text-orange-500 mt-0.5 text-sm"></i>
+                    <p class="text-xs text-orange-800 leading-relaxed" id="txt-file-warning">
+                        Le copier-coller ne transfère pas les fichiers.
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1" id="lbl-header-instructions">6. Instructions</h3>
+                    <button onclick="addInstruction()" class="text-md-sys-primary hover:bg-pink-50 w-6 h-6 rounded-full flex items-center justify-center transition"><i class="fas fa-plus text-xs"></i></button>
+                </div>
+                <div id="instructions-container" class="space-y-2"></div>
+            </div>
+
+            <div class="pt-2 border-t border-gray-100">
+                <label class="m3-checkbox-container">
+                    <input type="checkbox" id="feedback-loop" class="m3-checkbox" onchange="updateOutput()">
+                    <span class="text-sm text-[#444746] font-medium" id="lbl-feedback">Activer la boucle de feedback</span>
+                </label>
+            </div>
+
+            <div class="md:hidden pt-8 pb-4 text-center border-t border-gray-100 mt-4">
+                <p class="text-xs text-gray-500 mb-2"><span class="lbl-developed-mobile">Développé par</span> <strong>Fabrice Faucheux</strong></p>
+                <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
+                    <i class="fab fa-paypal"></i> <span class="lbl-tip-mobile">M'offrir un pourboire</span>
+                </a>
+            </div>
+
+        </div>
+
+        <footer class="hidden md:block flex-none p-4 border-t border-gray-200 bg-gray-50 text-center">
+             <p class="text-xs text-gray-500 mb-2"><span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong></p>
+             <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
+                <i class="fab fa-paypal"></i> <span id="lbl-tip">M'offrir un pourboire</span>
+            </a>
+        </footer>
+    </aside>
+
+    <main id="panel-preview" class="hidden md:flex flex-grow flex-col h-full bg-md-sys-surface overflow-hidden relative pb-20 md:pb-0">
+        
+        <div class="flex-none px-4 pt-4 pb-2 flex justify-between items-end flex-wrap gap-2">
+            <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2">
+                    <i class="fab fa-markdown"></i> <span id="lbl-preview">Aperçu</span>
+                </button>
+                <button onclick="switchTab('json')" id="tab-btn-json" class="tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2">
+                    <i class="fas fa-code"></i> JSON
+                </button>
+            </div>
+            
+            <button onclick="copyCurrentContent()" class="bg-md-sys-primary hover:bg-pink-700 text-white px-5 py-2.5 rounded-full shadow-elevation-1 transition-all flex items-center gap-2 text-sm font-medium">
+                <i class="far fa-copy"></i>
+                <span id="copy-btn-text">Copier</span>
+            </button>
+        </div>
+
+        <div class="flex-grow p-4 overflow-hidden">
+            <div class="h-full w-full bg-white rounded-3xl border border-white shadow-sm overflow-hidden flex flex-col relative">
+                
+                <div id="view-markdown" class="p-6 md:p-8 overflow-y-auto h-full prose prose-slate max-w-none font-sans text-gray-700 text-sm md:text-base">
+                    <div class="flex items-center gap-2 text-gray-400 mb-4 opacity-50 select-none">
+                        <i class="fas fa-sparkles"></i> <span id="lbl-generated">Aperçu généré</span>
+                    </div>
+                    <div id="markdown-content" class="whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+
+                <div id="view-json" class="hidden p-0 h-full bg-[#1e1e1e] overflow-auto">
+                    <pre class="p-6 text-xs md:text-sm font-mono leading-relaxed text-[#e0e0e0]"><code id="json-content"></code></pre>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around p-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <button onclick="showMobileTab('editor')" id="nav-btn-editor" class="mobile-nav-btn active flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500">
+            <i class="fas fa-pen"></i>
+            <span class="text-xs font-medium" id="lbl-nav-edit">Éditer</span>
+        </button>
+        <div class="w-px bg-gray-200 my-1"></div>
+        <button onclick="showMobileTab('preview')" id="nav-btn-preview" class="mobile-nav-btn flex flex-col items-center gap-1 p-2 rounded-xl flex-1 transition text-gray-500">
+            <i class="fas fa-eye"></i>
+            <span class="text-xs font-medium" id="lbl-nav-view">Résultat</span>
+        </button>
+    </nav>
+
+    <div id="modal-save" class="modal-backdrop fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-[fadeIn_0.2s]">
+            <h3 class="text-lg font-medium text-gray-800 mb-4" id="lbl-modal-title">Sauvegarder le modèle</h3>
+            <div class="m3-field mb-4 rounded-t-lg bg-gray-50">
+                <input type="text" id="template-name-input" class="m3-input" placeholder=" " autofocus>
+                <label class="m3-label">Nom du modèle</label>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeSaveModal()" class="px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-full transition">Annuler</button>
+                <button onclick="confirmSaveTemplate()" class="px-4 py-2 text-sm font-medium bg-md-sys-primary text-white hover:bg-pink-700 rounded-full transition">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-[#323232] text-white px-4 py-3 rounded shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-[60] flex items-center gap-3 w-max">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="txt-toast">Copié !</span>
+    </div>
+
+    <script>
+        // --- TRANSLATIONS ---
+        const translations = {
+            fr: {
+                lbl_role: "1. Persona (Rôle)",
+                ph_role: "Ex: Peintre, Décorateur d'intérieur, Façadier...",
+                lbl_task: "2. Tâche (Mission)",
+                ph_task: "Ex: Créer une palette, Estimer des travaux...",
+                lbl_context: "3. Contexte",
+                ph_context: "Salon sombre, Rénovation haussmannien, Façade extérieure...",
+                lbl_header_format: "4. Format & Contraintes",
+                lbl_tone: "Ton",
+                lbl_format: "Format",
+                lbl_constraints: "Autres contraintes",
+                ph_constraints: "Ex: Peinture biosourcée, Budget serré, Style Japandi...",
+                lbl_header_files: "5. Pièces jointes",
+                txt_dropzone: "Glisser ou <span class='text-md-sys-primary'>Parcourir</span>",
+                txt_file_warning: "Le copier-coller ne transfère pas les fichiers.",
+                lbl_header_instructions: "6. Instructions",
+                lbl_feedback: "Activer la boucle de feedback",
+                lbl_preview: "Aperçu",
+                lbl_generated: "Aperçu généré",
+                btn_copy: "Copier",
+                txt_toast: "Copié !",
+                lbl_developed: "Développé par",
+                lbl_tip: "M'offrir un pourboire",
+                lbl_nav_edit: "Éditer",
+                lbl_nav_view: "Résultat",
+                // Templates
+                lbl_template_default: "✨ Modèles Déco...",
+                lbl_group_default: "Modèles Métiers",
+                lbl_group_custom: "Mes modèles",
+                lbl_modal_title: "Sauvegarder le modèle",
+                // Prompt Strings
+                prompt_you_are: "Tu es un",
+                prompt_task: "Ta mission est de :",
+                prompt_context: "Contexte :",
+                prompt_tone: "Ton :",
+                prompt_format: "Format :",
+                prompt_constraints: "Contraintes :",
+                prompt_files: "Fichiers joints :",
+                prompt_file_item: "[Fichier : ",
+                prompt_instructions: "Instructions :",
+                prompt_feedback: "\n\n---\n**IMPORTANT :** Avant de générer la réponse finale, pose-moi des questions si tu as besoin de précisions ou de contexte supplémentaire."
+            },
+            en: {
+                lbl_role: "1. Persona (Role)",
+                ph_role: "Ex: Painter, Interior Designer, Decorator...",
+                lbl_task: "2. Task (Mission)",
+                ph_task: "Ex: Create color palette, Estimate costs...",
+                lbl_context: "3. Context",
+                ph_context: "Dark living room, Full renovation, Exterior wall...",
+                lbl_header_format: "4. Format & Constraints",
+                lbl_tone: "Tone",
+                lbl_format: "Format",
+                lbl_constraints: "Other Constraints",
+                ph_constraints: "Ex: Eco-friendly paint, Low budget, Japandi style...",
+                lbl_header_files: "5. Attachments",
+                txt_dropzone: "Drag or <span class='text-md-sys-primary'>Browse</span>",
+                txt_file_warning: "Copy/paste doesn't transfer files.",
+                lbl_header_instructions: "6. Instructions",
+                lbl_feedback: "Enable Feedback Loop",
+                lbl_preview: "Preview",
+                lbl_generated: "Generated Preview",
+                btn_copy: "Copy",
+                txt_toast: "Copied!",
+                lbl_developed: "Developed by",
+                lbl_tip: "Leave a tip",
+                lbl_nav_edit: "Edit",
+                lbl_nav_view: "Result",
+                // Templates
+                lbl_template_default: "✨ Deco Templates...",
+                lbl_group_default: "Pro Templates",
+                lbl_group_custom: "My Templates",
+                lbl_modal_title: "Save Template",
+                // Prompt Strings
+                prompt_you_are: "You are a",
+                prompt_task: "Your task is to:",
+                prompt_context: "Context:",
+                prompt_tone: "Tone:",
+                prompt_format: "Format:",
+                prompt_constraints: "Constraints:",
+                prompt_files: "Attachments:",
+                prompt_file_item: "[File: ",
+                prompt_instructions: "Instructions:",
+                prompt_feedback: "\n\n---\n**IMPORTANT:** Before generating the final response, ask me questions if you need clarification or additional context."
+            }
+        };
+
+        // --- DATA & STATE ---
+        // Unique storage key for Painter/Deco version
+        const STORAGE_KEY = 'prompt_peintre_templates_v1';
+        
+        const defaultTemplates = {
+            color_harmony: {
+                fr: {
+                    name: "Harmonie Couleurs",
+                    role: "Décorateur d'intérieur Expert",
+                    task: "Proposer 3 palettes de couleurs distinctes (Moodboards) pour la pièce décrite.",
+                    context: "Salon de 25m² orienté Nord (peu lumineux). Sol en parquet chêne clair. Mobilier existant gris anthracite.",
+                    tone: "creative",
+                    format: "list",
+                    constraints: "Style recherché : Chaleureux et lumineux. Intégrer une couleur d'accent.",
+                    instructions: [
+                        "Donner un nom évocateur à chaque palette.",
+                        "Détailler les références couleurs (code HEX ou nom générique) pour murs, plafond et accessoires.",
+                        "Expliquer l'effet psychologique/visuel recherché pour chaque option."
+                    ]
+                },
+                en: {
+                    name: "Color Harmony",
+                    role: "Expert Interior Decorator",
+                    task: "Propose 3 distinct color palettes (Moodboards) for the described room.",
+                    context: "25m² North-facing living room (low light). Light oak flooring. Existing dark grey furniture.",
+                    tone: "creative",
+                    format: "list",
+                    constraints: "Desired style: Warm and bright. Include an accent color.",
+                    instructions: [
+                        "Give an evocative name to each palette.",
+                        "Detail color references (HEX code or generic name) for walls, ceiling, and accessories.",
+                        "Explain the psychological/visual effect intended for each option."
+                    ]
+                }
+            },
+            technical_quote: {
+                fr: {
+                    name: "Descriptif Devis",
+                    role: "Artisan Peintre Qualifié",
+                    task: "Rédiger le libellé technique détaillé pour un devis de mise en peinture.",
+                    context: "Chambre enfant 12m². Murs: Plâtre ancien avec papier peint à détapisser. Plafond: Sain.",
+                    tone: "professional",
+                    format: "text",
+                    constraints: "Peinture Velours classe A+ (COV faibles).",
+                    instructions: [
+                        "Lister chronologiquement les étapes de préparation (dépose, lessivage, rebouchage, impression).",
+                        "Préciser le type de produit utilisé pour chaque couche.",
+                        "Inclure une clause sur la protection du chantier et le nettoyage."
+                    ]
+                },
+                en: {
+                    name: "Quote Description",
+                    role: "Qualified Painter",
+                    task: "Write the detailed technical description for a painting quote.",
+                    context: "Child's bedroom 12m². Walls: Old plaster with wallpaper to remove. Ceiling: Good condition.",
+                    tone: "professional",
+                    format: "text",
+                    constraints: "Velvet finish paint Class A+ (Low VOC).",
+                    instructions: [
+                        "List preparation steps chronologically (removal, washing, filling, priming).",
+                        "Specify the type of product used for each layer.",
+                        "Include a clause on site protection and cleaning."
+                    ]
+                }
+            },
+            quantity_calc: {
+                fr: {
+                    name: "Calcul Quantités (Métré)",
+                    role: "Metreur Vérificateur",
+                    task: "Calculer les surfaces à peindre et la quantité de peinture nécessaire.",
+                    context: "Appartement T3 vide. Hauteur sous plafond: 2.50m. Pièce 1: 4x3m. Pièce 2: 3x3m. Couloir: 5x1m.",
+                    tone: "technical",
+                    format: "table",
+                    constraints: "Rendement peinture retenu : 10m²/L. Prévoir 2 couches partout.",
+                    instructions: [
+                        "Calculer la surface murale (déduire 10% forfaitaire pour ouvertures).",
+                        "Calculer la surface plafond.",
+                        "Donner le nombre de fûts de 15L à commander (arrondi au supérieur)."
+                    ]
+                },
+                en: {
+                    name: "Quantity Calculation",
+                    role: "Quantity Surveyor",
+                    task: "Calculate painting surfaces and required paint quantity.",
+                    context: "Empty 2-bed flat. Ceiling height: 2.50m. Room 1: 4x3m. Room 2: 3x3m. Hallway: 5x1m.",
+                    tone: "technical",
+                    format: "table",
+                    constraints: "Paint coverage: 10m²/L. Plan for 2 coats everywhere.",
+                    instructions: [
+                        "Calculate wall surface (deduct 10% flat rate for openings).",
+                        "Calculate ceiling surface.",
+                        "Provide the number of 15L drums to order (rounded up)."
+                    ]
+                }
+            }
+        };
+
+        const tones = [
+            { value: "professional", label: { fr: "Professionnel", en: "Professional" } },
+            { value: "creative", label: { fr: "Créatif & Inspirant", en: "Creative & Inspiring" } },
+            { value: "technical", label: { fr: "Technique & Précis", en: "Technical & Precise" } },
+            { value: "persuasive", label: { fr: "Commercial & Vendeur", en: "Commercial & Persuasive" } },
+            { value: "didactic", label: { fr: "Pédagogique (Explicatif)", en: "Didactic (Explanatory)" } }
+        ];
+
+        const formats = [
+            { value: "text", label: { fr: "Texte structuré", en: "Structured Text" } },
+            { value: "bullet", label: { fr: "Liste à puces", en: "Bullet Points" } },
+            { value: "table", label: { fr: "Tableau", en: "Table" } },
+            { value: "email", label: { fr: "Email", en: "Email" } },
+            { value: "step", label: { fr: "Pas à pas (Step-by-step)", en: "Step-by-step" } }
+        ];
+
+        // --- APP LOGIC ---
+        let currentLang = 'fr';
+        let customTemplates = {};
+        let uploadedFiles = [];
+
+        function init() {
+            // Load saved templates
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try { customTemplates = JSON.parse(saved); } catch (e) { console.error("Error loading templates", e); }
+            }
+            
+            populateSelects();
+            renderTemplateOptions();
+            updateLabels();
+            
+            // Mobile check
+            if (window.innerWidth < 768) {
+                showMobileTab('editor');
+            } else {
+                updateOutput();
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'fr' ? 'en' : 'fr';
+            document.getElementById('lang-display').textContent = currentLang.toUpperCase();
+            updateLabels();
+            populateSelects(); // Re-populate to update labels in options
+            renderTemplateOptions(); // Update template names if standard ones change
+            updateOutput();
+        }
+
+        function updateLabels() {
+            const t = translations[currentLang];
+            
+            // Static IDs
+            const ids = [
+                'lbl-role', 'lbl-task', 'lbl-context', 'lbl-header-format', 'lbl-tone', 'lbl-format', 
+                'lbl-constraints', 'lbl-header-files', 'txt-dropzone', 'txt-file-warning', 
+                'lbl-header-instructions', 'lbl-feedback', 'lbl-preview', 'lbl-generated', 
+                'lbl-developed', 'lbl-tip', 'lbl-nav-edit', 'lbl-nav-view', 'lbl-modal-title'
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id); // Handle ID mismatch (kebab vs snake in object)
+                const key = id.replace(/-/g, '_'); // lbl-role -> lbl_role
+                if (el && t[key]) el.innerHTML = t[key];
+            });
+
+            // Specific Placeholders
+            document.getElementById('role').placeholder = t.ph_role;
+            document.getElementById('task').placeholder = t.ph_task;
+            document.getElementById('context').placeholder = t.ph_context;
+            document.getElementById('constraints').placeholder = t.ph_constraints;
+            
+            document.getElementById('copy-btn-text').textContent = t.btn_copy;
+            document.getElementById('txt-toast').textContent = t.txt_toast;
+
+            // Mobile specific
+            document.querySelectorAll('.lbl-developed-mobile').forEach(el => el.textContent = t.lbl_developed);
+            document.querySelectorAll('.lbl-tip-mobile').forEach(el => el.textContent = t.lbl_tip);
+        }
+
+        function populateSelects() {
+            const toneSelect = document.getElementById('tone');
+            const formatSelect = document.getElementById('format');
+            const currentTone = toneSelect.value;
+            const currentFormat = formatSelect.value;
+
+            toneSelect.innerHTML = '';
+            formatSelect.innerHTML = '';
+
+            tones.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.value;
+                opt.textContent = t.label[currentLang];
+                toneSelect.appendChild(opt);
+            });
+
+            formats.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.value;
+                opt.textContent = f.label[currentLang];
+                formatSelect.appendChild(opt);
+            });
+
+            // Restore selection if valid, else default
+            if (currentTone) toneSelect.value = currentTone;
+            else toneSelect.value = "professional";
+            
+            if (currentFormat) formatSelect.value = currentFormat;
+            else formatSelect.value = "text";
+        }
+
+        function renderTemplateOptions() {
+            const select = document.getElementById('template-selector');
+            const t = translations[currentLang];
+            
+            // Keep first option
+            select.innerHTML = `<option value="">${t.lbl_template_default}</option>`;
+
+            // Standard Group
+            const groupStd = document.createElement('optgroup');
+            groupStd.label = t.lbl_group_default;
+            for (const [key, tpl] of Object.entries(defaultTemplates)) {
+                const opt = document.createElement('option');
+                opt.value = `std:${key}`;
+                opt.textContent = tpl[currentLang].name;
+                groupStd.appendChild(opt);
+            }
+            select.appendChild(groupStd);
+
+            // Custom Group
+            const keys = Object.keys(customTemplates);
+            if (keys.length > 0) {
+                const groupCust = document.createElement('optgroup');
+                groupCust.label = t.lbl_group_custom;
+                keys.forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = `cust:${key}`;
+                    opt.textContent = customTemplates[key].name;
+                    groupCust.appendChild(opt);
+                });
+                select.appendChild(groupCust);
+            }
+        }
+
+        function handleTemplateChange(value) {
+            if (!value) return;
+
+            const deleteBtn = document.getElementById('btn-delete-template');
+            let data = null;
+
+            if (value.startsWith('std:')) {
+                const key = value.split(':')[1];
+                data = defaultTemplates[key][currentLang];
+                deleteBtn.classList.add('hidden');
+            } else if (value.startsWith('cust:')) {
+                const key = value.split(':')[1];
+                data = customTemplates[key];
+                deleteBtn.classList.remove('hidden');
+            }
+
+            if (data) loadTemplateData(data);
+        }
+
+        function loadTemplateData(data) {
+            document.getElementById('role').value = data.role || "";
+            document.getElementById('task').value = data.task || "";
+            document.getElementById('context').value = data.context || "";
+            document.getElementById('tone').value = data.tone || "professional";
+            document.getElementById('format').value = data.format || "text";
+            document.getElementById('constraints').value = data.constraints || "";
+            
+            // Instructions
+            const container = document.getElementById('instructions-container');
+            container.innerHTML = '';
+            if (data.instructions && Array.isArray(data.instructions)) {
+                data.instructions.forEach(inst => addInstruction(inst));
+            } else {
+                addInstruction(); // Add at least one empty
+            }
+
+            updateOutput();
+        }
+
+        function addInstruction(value = "") {
+            const container = document.getElementById('instructions-container');
+            const div = document.createElement('div');
+            div.className = "flex items-center gap-2 animate-[fadeIn_0.2s]";
+            div.innerHTML = `
+                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                <input type="text" class="m3-input instruction-input border-b border-gray-200 focus:border-pink-500 py-2 px-1 text-sm" 
+                       value="${value}" placeholder="${currentLang === 'fr' ? 'Instruction précise...' : 'Precise instruction...'}" oninput="updateOutput()">
+                <button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-300 hover:text-red-400 w-6 h-6 flex items-center justify-center transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function handleFiles(files) {
+            const list = document.getElementById('file-list');
+            const warning = document.getElementById('file-warning');
+            
+            Array.from(files).forEach(file => {
+                uploadedFiles.push(file);
+                
+                const tag = document.createElement('div');
+                tag.className = "inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs animate-[fadeIn_0.2s] border border-gray-200";
+                tag.innerHTML = `
+                    <i class="far fa-file"></i>
+                    <span class="max-w-[100px] truncate">${file.name}</span>
+                    <button onclick="removeFile('${file.name}', this)" class="text-gray-400 hover:text-red-500 ml-1"><i class="fas fa-times"></i></button>
+                `;
+                list.appendChild(tag);
+            });
+            
+            // Reset input
+            document.getElementById('file-upload').value = '';
+            
+            if (uploadedFiles.length > 0) warning.classList.remove('hidden');
+            updateOutput();
+        }
+
+        function removeFile(name, btnElement) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== name);
+            btnElement.parentElement.remove();
+            if (uploadedFiles.length === 0) {
+                document.getElementById('file-warning').classList.add('hidden');
+            }
+            updateOutput();
+        }
+
+        function resetForm() {
+            document.getElementById('role').value = "";
+            document.getElementById('task').value = "";
+            document.getElementById('context').value = "";
+            document.getElementById('constraints').value = "";
+            document.getElementById('instructions-container').innerHTML = "";
+            addInstruction();
+            document.getElementById('file-list').innerHTML = "";
+            uploadedFiles = [];
+            document.getElementById('file-warning').classList.add('hidden');
+            document.getElementById('template-selector').value = "";
+            document.getElementById('btn-delete-template').classList.add('hidden');
+            updateOutput();
+        }
+
+        // --- GENERATION & OUTPUT ---
+        function updateOutput() {
+            const role = document.getElementById('role').value;
+            const task = document.getElementById('task').value;
+            const context = document.getElementById('context').value;
+            
+            const toneSelect = document.getElementById('tone');
+            const toneLabel = toneSelect.options[toneSelect.selectedIndex]?.text || "";
+            
+            const formatSelect = document.getElementById('format');
+            const formatLabel = formatSelect.options[formatSelect.selectedIndex]?.text || "";
+            
+            const constraints = document.getElementById('constraints').value;
+            const feedback = document.getElementById('feedback-loop').checked;
+
+            // Collect instructions
+            const instructionInputs = document.querySelectorAll('.instruction-input');
+            const instructionList = Array.from(instructionInputs).map(i => i.value).filter(v => v.trim() !== "");
+
+            // Build Prompt
+            const t = translations[currentLang];
+            let prompt = "";
+
+            if (role) prompt += `**${t.prompt_you_are} ${role}.**\n`;
+            if (task) prompt += `\n${t.prompt_task} ${task}\n`;
+            if (context) prompt += `\n${t.prompt_context} ${context}\n`;
+            
+            prompt += `\n---\n`;
+            prompt += `**${t.prompt_tone}** ${toneLabel}\n`;
+            prompt += `**${t.prompt_format}** ${formatLabel}\n`;
+            if (constraints) prompt += `**${t.prompt_constraints}** ${constraints}\n`;
+            
+            if (uploadedFiles.length > 0) {
+                prompt += `**${t.prompt_files}**\n`;
+                uploadedFiles.forEach(f => prompt += `- ${t.prompt_file_item}${f.name}]\n`);
+            }
+
+            if (instructionList.length > 0) {
+                prompt += `\n**${t.prompt_instructions}**\n`;
+                instructionList.forEach(i => prompt += `- ${i}\n`);
+            }
+
+            if (feedback) {
+                prompt += t.prompt_feedback;
+            }
+
+            // Render Markdown
+            document.getElementById('markdown-content').textContent = prompt;
+            
+            // Render JSON
+            const jsonObj = {
+                role, task, context, tone: toneLabel, format: formatLabel, constraints, 
+                files: uploadedFiles.map(f => f.name), instructions: instructionList, feedback
+            };
+            const jsonStr = JSON.stringify(jsonObj, null, 2);
+            document.getElementById('json-content').innerHTML = syntaxHighlight(jsonStr);
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function copyCurrentContent() {
+            const activeTab = document.getElementById('tab-btn-markdown').classList.contains('tab-active') ? 'markdown' : 'json';
+            let content = "";
+            
+            if (activeTab === 'markdown') {
+                content = document.getElementById('markdown-content').textContent;
+            } else {
+                content = document.getElementById('json-content').textContent;
+            }
+
+            navigator.clipboard.writeText(content).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                toast.style.transform = "translate(-50%, 0)";
+                setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                    toast.style.transform = "translate(-50%, -10px)";
+                }, 2000);
+            });
+        }
+
+        // --- TABS & MODALS ---
+        function switchTab(tab) {
+            const mdBtn = document.getElementById('tab-btn-markdown');
+            const jsonBtn = document.getElementById('tab-btn-json');
+            const mdView = document.getElementById('view-markdown');
+            const jsonView = document.getElementById('view-json');
+
+            if (tab === 'markdown') {
+                mdBtn.className = "tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2";
+                jsonBtn.className = "tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2";
+                mdView.classList.remove('hidden');
+                jsonView.classList.add('hidden');
+            } else {
+                mdBtn.className = "tab-inactive px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2";
+                jsonBtn.className = "tab-active px-4 py-2 rounded-full text-xs md:text-sm transition-all flex items-center gap-2";
+                mdView.classList.add('hidden');
+                jsonView.classList.remove('hidden');
+            }
+        }
+
+        function showMobileTab(tab) {
+            const editorPanel = document.getElementById('panel-editor');
+            const previewPanel = document.getElementById('panel-preview');
+            const btnEditor = document.getElementById('nav-btn-editor');
+            const btnPreview = document.getElementById('nav-btn-preview');
+
+            if (tab === 'editor') {
+                editorPanel.classList.remove('hidden');
+                previewPanel.classList.add('hidden');
+                previewPanel.classList.remove('flex');
+                btnEditor.classList.add('active');
+                btnPreview.classList.remove('active');
+            } else {
+                editorPanel.classList.add('hidden');
+                previewPanel.classList.remove('hidden');
+                previewPanel.classList.add('flex');
+                btnEditor.classList.remove('active');
+                btnPreview.classList.add('active');
+                updateOutput(); // Refresh on view
+            }
+        }
+
+        // --- SAVE SYSTEM ---
+        function openSaveModal() {
+            document.getElementById('modal-save').classList.remove('hidden');
+            document.getElementById('template-name-input').focus();
+        }
+        
+        function closeSaveModal() {
+            document.getElementById('modal-save').classList.add('hidden');
+        }
+
+        function confirmSaveTemplate() {
+            const name = document.getElementById('template-name-input').value.trim();
+            if (!name) return;
+
+            // Collect Data
+            const data = {
+                name: name,
+                role: document.getElementById('role').value,
+                task: document.getElementById('task').value,
+                context: document.getElementById('context').value,
+                tone: document.getElementById('tone').value,
+                format: document.getElementById('format').value,
+                constraints: document.getElementById('constraints').value,
+                instructions: Array.from(document.querySelectorAll('.instruction-input')).map(i => i.value).filter(v => v.trim() !== "")
+            };
+
+            // Save ID
+            const id = 'tpl_' + Date.now();
+            customTemplates[id] = data;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(customTemplates));
+
+            // Refresh UI
+            closeSaveModal();
+            renderTemplateOptions();
+            document.getElementById('template-selector').value = `cust:${id}`;
+            document.getElementById('btn-delete-template').classList.remove('hidden');
+            
+            alert(currentLang === 'fr' ? "Modèle sauvegardé !" : "Template saved!");
+        }
+
+        function deleteCustomTemplate() {
+            const selector = document.getElementById('template-selector');
+            const val = selector.value;
+            if (!val.startsWith('cust:')) return;
+
+            if (confirm(currentLang === 'fr' ? "Supprimer ce modèle ?" : "Delete this template?")) {
+                const id = val.split(':')[1];
+                delete customTemplates[id];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(customTemplates));
+                
+                renderTemplateOptions();
+                resetForm();
+            }
+        }
+
+        // Start
+        window.addEventListener('DOMContentLoaded', init);
+        
+        // Escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeSaveModal();
+        });
+
+    </script>
+</body>
+</html>
