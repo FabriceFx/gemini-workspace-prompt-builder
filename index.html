@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Builder - Accueil</title>
+    <title>Prompt Builder - Workspace</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -50,68 +50,183 @@
             background-color: #0b57d0;
             color: white;
         }
+        
+        /* Language switcher active state */
+        .lang-btn.active {
+            color: #0b57d0;
+            font-weight: 700;
+            background-color: #e3ecfa;
+        }
     </style>
 </head>
-<body class="min-h-screen w-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen w-screen flex flex-col items-center justify-center p-4 relative">
+
+    <div class="absolute top-4 right-4 flex bg-white rounded-full shadow-sm border border-gray-200 p-1 fade-in">
+        <button onclick="setLanguage('fr')" id="btn-fr" class="lang-btn active px-3 py-1 rounded-full text-xs text-gray-600 hover:bg-gray-50 transition">FR</button>
+        <button onclick="setLanguage('en')" id="btn-en" class="lang-btn px-3 py-1 rounded-full text-xs text-gray-600 hover:bg-gray-50 transition">EN</button>
+    </div>
 
     <div class="text-center mb-10 fade-in" style="animation-delay: 0.1s;">
         <h1 class="text-4xl md:text-5xl font-normal text-[#1f1f1f] mb-3 tracking-tight">
             Prompt<span class="font-medium text-[#0b57d0]">Builder</span> Workspace
         </h1>
-        <p class="text-gray-500 text-lg">Choisissez votre domaine d'activité pour commencer</p>
+        <p class="text-gray-500 text-lg" data-translate="subtitle">Choisissez votre domaine d'activité pour commencer</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full fade-in mb-8" style="animation-delay: 0.2s;">
+
+        <a href="LePromptAchat.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+            <div class="icon-circle w-16 h-16 rounded-full bg-orange-50 text-orange-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-cart-shopping"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_achat_title">Achats</h3>
+            <p class="text-sm text-gray-500" data-translate="card_achat_desc">Négociation, fournisseurs et appels d'offres.</p>
+        </a>
 
         <a href="LePromptAgricole.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
             <div class="icon-circle w-16 h-16 rounded-full bg-green-50 text-green-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-tractor"></i>
             </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2">Agricole</h3>
-            <p class="text-sm text-gray-500">Gestion d'exploitation, PAC et suivis de cultures.</p>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_agri_title">Agricole</h3>
+            <p class="text-sm text-gray-500" data-translate="card_agri_desc">Gestion d'exploitation, PAC et cultures.</p>
         </a>
 
         <a href="LePromptComptable.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
             <div class="icon-circle w-16 h-16 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-calculator"></i>
             </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2">Comptable</h3>
-            <p class="text-sm text-gray-500">Bilans, audits financiers et fiscalité.</p>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_compta_title">Comptable</h3>
+            <p class="text-sm text-gray-500" data-translate="card_compta_desc">Bilans, audits financiers et fiscalité.</p>
+        </a>
+
+        <a href="LePromptEducation.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+            <div class="icon-circle w-16 h-16 rounded-full bg-yellow-50 text-yellow-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_edu_title">Éducation</h3>
+            <p class="text-sm text-gray-500" data-translate="card_edu_desc">Pédagogie, cours et évaluations.</p>
+        </a>
+
+        <a href="LePromptIT.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+            <div class="icon-circle w-16 h-16 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_it_title">IT & Tech</h3>
+            <p class="text-sm text-gray-500" data-translate="card_it_desc">Développement, infrastructure et support.</p>
         </a>
 
         <a href="LePromptJuridique.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
             <div class="icon-circle w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-scale-balanced"></i>
             </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2">Juridique</h3>
-            <p class="text-sm text-gray-500">Contrats, veilles réglementaires et mémos.</p>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_legal_title">Juridique</h3>
+            <p class="text-sm text-gray-500" data-translate="card_legal_desc">Contrats, veilles réglementaires et mémos.</p>
+        </a>
+
+        <a href="LePromptQualite.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+            <div class="icon-circle w-16 h-16 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_quality_title">Qualité</h3>
+            <p class="text-sm text-gray-500" data-translate="card_quality_desc">Normes ISO, audits et amélioration continue.</p>
         </a>
 
         <a href="general.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
             <div class="icon-circle w-16 h-16 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-wand-magic-sparkles"></i>
             </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2">Général</h3>
-            <p class="text-sm text-gray-500">Création libre pour tous les autres usages.</p>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_general_title">Général</h3>
+            <p class="text-sm text-gray-500" data-translate="card_general_desc">Création libre pour tous les autres usages.</p>
         </a>
 
     </div>
 
     <div class="text-center fade-in bg-white/50 p-4 rounded-2xl border border-dashed border-gray-300 max-w-xl mx-auto mb-4" style="animation-delay: 0.25s;">
-        <p class="text-sm text-gray-600 mb-2">Vous ne trouvez pas votre métier ?</p>
+        <p class="text-sm text-gray-600 mb-2" data-translate="contact_text">Vous ne trouvez pas votre métier ?</p>
         <a href="mailto:contact@atelier-informatique.com?subject=Suggestion%20de%20nouveau%20modèle%20PromptBuilder" class="text-[#0b57d0] font-medium hover:underline inline-flex items-center gap-2">
-            <i class="far fa-envelope"></i> Demander un nouveau modèle
+            <i class="far fa-envelope"></i> <span data-translate="contact_link">Demander un nouveau modèle</span>
         </a>
     </div>
 
     <footer class="mt-8 text-center fade-in pb-4" style="animation-delay: 0.3s;">
         <p class="text-xs text-gray-500 mb-3">
-            <span id="lbl-developed">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong>
+            <span data-translate="footer_dev">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong>
         </p>
         <a href="https://paypal.me/FFaucheux?country.x=FR&locale.x=fr_FR" target="_blank" class="text-xs inline-flex items-center gap-2 px-4 py-2 bg-[#003087] text-white rounded-full hover:bg-[#001c64] transition shadow-sm font-medium">
-            <i class="fab fa-paypal"></i> <span id="lbl-tip">M'offrir un pourboire</span>
+            <i class="fab fa-paypal"></i> <span data-translate="footer_tip">M'offrir un pourboire</span>
         </a>
     </footer>
+
+    <script>
+        const translations = {
+            fr: {
+                subtitle: "Choisissez votre domaine d'activité pour commencer",
+                card_achat_title: "Achats",
+                card_achat_desc: "Négociation, fournisseurs et appels d'offres.",
+                card_agri_title: "Agricole",
+                card_agri_desc: "Gestion d'exploitation, PAC et cultures.",
+                card_compta_title: "Comptable",
+                card_compta_desc: "Bilans, audits financiers et fiscalité.",
+                card_edu_title: "Éducation",
+                card_edu_desc: "Pédagogie, cours et évaluations.",
+                card_it_title: "IT & Tech",
+                card_it_desc: "Développement, infrastructure et support.",
+                card_legal_title: "Juridique",
+                card_legal_desc: "Contrats, veilles réglementaires et mémos.",
+                card_quality_title: "Qualité",
+                card_quality_desc: "Normes ISO, audits et amélioration continue.",
+                card_general_title: "Général",
+                card_general_desc: "Création libre pour tous les autres usages.",
+                contact_text: "Vous ne trouvez pas votre métier ?",
+                contact_link: "Demander un nouveau modèle",
+                footer_dev: "Développé par",
+                footer_tip: "M'offrir un pourboire"
+            },
+            en: {
+                subtitle: "Choose your field of activity to start",
+                card_achat_title: "Purchasing",
+                card_achat_desc: "Negotiation, suppliers and tenders.",
+                card_agri_title: "Agriculture",
+                card_agri_desc: "Farm management, CAP and crop monitoring.",
+                card_compta_title: "Accounting",
+                card_compta_desc: "Balance sheets, financial audits and tax.",
+                card_edu_title: "Education",
+                card_edu_desc: "Pedagogy, courses and evaluations.",
+                card_it_title: "IT & Tech",
+                card_it_desc: "Development, infrastructure and support.",
+                card_legal_title: "Legal",
+                card_legal_desc: "Contracts, regulatory monitoring and memos.",
+                card_quality_title: "Quality",
+                card_quality_desc: "ISO standards, audits and continuous improvement.",
+                card_general_title: "General",
+                card_general_desc: "Free creation for all other uses.",
+                contact_text: "Can't find your profession?",
+                contact_link: "Request a new model",
+                footer_dev: "Developed by",
+                footer_tip: "Send a tip"
+            }
+        };
+
+        function setLanguage(lang) {
+            // Update texts
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Update buttons state
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+        }
+
+        // Initialize (optional: auto-detect browser language or default to FR)
+        // setLanguage('fr'); // Default is already hardcoded in HTML, so no need to force it unless checking storage.
+    </script>
 
 </body>
 </html>
