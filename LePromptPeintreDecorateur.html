@@ -489,6 +489,100 @@
                         "Provide the number of 15L drums to order (rounded up)."
                     ]
                 }
+            },
+            diagnostic_support: {
+                fr: {
+                    name: "Diagnostic Supports",
+                    role: "Expert Technique Bâtiment",
+                    task: "Rédiger un diagnostic de l'état des supports avant travaux (DTU 59.1).",
+                    context: "Rénovation maison années 70. Murs cuisine : traces d'humidité anciennes (sèches) et peinture écaillée. Plafond : Fissure traversante.",
+                    tone: "technical",
+                    format: "bullet",
+                    constraints: "Identifier les pathologies et proposer les remèdes (durcisseur, toilé, etc.).",
+                    instructions: [
+                        "Analyser l'état de chaque support (Murs/Plafonds).",
+                        "Lister les tests à effectuer (test à la goutte, quadrillage, humidimètre).",
+                        "Recommander le traitement préparatoire spécifique (Impression hydrofuge ? Bande armée ?)."
+                    ]
+                },
+                en: {
+                    name: "Surface Diagnostic",
+                    role: "Building Expert",
+                    task: "Write a diagnostic report on surface conditions before painting.",
+                    context: "1970s house renovation. Kitchen walls: old dry damp patches and flaking paint. Ceiling: traversing crack.",
+                    tone: "technical",
+                    format: "bullet",
+                    constraints: "Identify pathologies and propose remedies (hardener, mesh, etc.).",
+                    instructions: [
+                        "Analyze the condition of each surface (Walls/Ceilings).",
+                        "List tests to perform (water drop test, cross-cut test, moisture meter).",
+                        "Recommend specific preparatory treatment (Hydrophobic primer? Reinforced tape?)."
+                    ]
+                }
+            },
+            social_insta: {
+                fr: {
+                    name: "Post Instagram Avant/Après",
+                    role: "Community Manager Déco",
+                    task: "Rédiger la légende engageante pour un post Instagram montrant une transformation.",
+                    context: "Projet : Relooking d'un escalier bois sombre en blanc + contremarches bleu canard.",
+                    tone: "creative",
+                    format: "text",
+                    constraints: "Ton enthousiaste. Utiliser des émojis. Inciter au commentaire.",
+                    instructions: [
+                        "Accroche dynamique sur le changement radical.",
+                        "Expliquer brièvement la technique (ponçage, sous-couche bois, peinture sol).",
+                        "Ajouter une liste de 10 hashtags pertinents (#renovation #escalier #decoration...).",
+                        "Finir par une question pour engager la communauté."
+                    ]
+                },
+                en: {
+                    name: "Instagram Before/After",
+                    role: "Deco Community Manager",
+                    task: "Write an engaging caption for an Instagram post showing a transformation.",
+                    context: "Project: Makeover of a dark wood staircase to white + teal risers.",
+                    tone: "creative",
+                    format: "text",
+                    constraints: "Enthusiastic tone. Use emojis. Encourage comments.",
+                    instructions: [
+                        "Dynamic hook about the radical change.",
+                        "Briefly explain the technique (sanding, wood primer, floor paint).",
+                        "Add a list of 10 relevant hashtags (#renovation #staircase #homedecor...).",
+                        "End with a question to engage the community."
+                    ]
+                }
+            },
+            client_delay: {
+                fr: {
+                    name: "Email Retard Chantier",
+                    role: "Chef d'entreprise",
+                    task: "Rédiger un email diplomate pour annoncer un décalage de début de chantier.",
+                    context: "Le chantier devait débuter lundi. Panne de véhicule utilitaire ce matin. Décalage à mercredi.",
+                    tone: "professional",
+                    format: "email",
+                    constraints: "Rester professionnel, s'excuser sans se dévaloriser, rassurer sur les délais de fin.",
+                    instructions: [
+                        "Objet de l'email clair et formel.",
+                        "Annoncer le contretemps factuellement.",
+                        "Proposer la nouvelle date d'intervention.",
+                        "Confirmer que la date de fin de chantier reste inchangée (si possible) en renforçant l'équipe."
+                    ]
+                },
+                en: {
+                    name: "Delay Notification Email",
+                    role: "Business Owner",
+                    task: "Write a diplomatic email to announce a delay in starting the site.",
+                    context: "Work was to start Monday. Van breakdown this morning. Postponed to Wednesday.",
+                    tone: "professional",
+                    format: "email",
+                    constraints: "Remain professional, apologize without self-depreciation, reassure on completion deadlines.",
+                    instructions: [
+                        "Clear and formal email subject.",
+                        "Announce the setback factually.",
+                        "Propose the new intervention date.",
+                        "Confirm that the completion date remains unchanged (if possible) by reinforcing the team."
+                    ]
+                }
             }
         };
 
