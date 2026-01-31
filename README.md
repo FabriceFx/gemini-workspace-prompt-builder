@@ -5,49 +5,58 @@
 ![Runtime](https://img.shields.io/badge/Google%20Apps%20Script-V8-green)
 ![Author](https://img.shields.io/badge/Auteur-Fabrice%20Faucheux-orange)
 
-**[Français]**
-Un outil interactif et intuitif pour structurer vos prompts Gemini dans Google Workspace. Basé sur les directives officielles, il permet de construire des requêtes complètes incluant Persona, Tâche, Contexte et Format.
+## 🇫🇷 Français : Guide Pédagogique
+
 https://fabricefx.github.io/gemini-workspace-prompt-builder/
 
-**[English]**
-An interactive and intuitive tool to structure Gemini prompts for Google Workspace. Based on official guidelines, it helps build complete queries including Persona, Task, Context, and Format.
-https://fabricefx.github.io/gemini-workspace-prompt-builder/
+### 📝 Présentation
+Le **Gemini Workspace Prompt Builder** est un outil conçu pour professionnaliser l'usage de l'IA générative au sein de l'entreprise. Il guide l'utilisateur dans la création de requêtes structurées selon la méthode des 4 piliers : **Persona**, **Tâche**, **Contexte** et **Format**.
+
+### 🚀 Nouvelles Fonctionnalités
+* **Gestion Dynamique des Modèles** : Sauvegarde personnalisée des prompts dans le stockage local (`localStorage`) du navigateur.
+* **Bibliothèques Métiers Spécialisées** : Accès à des interfaces dédiées pour les Achats, l'Agriculture, la Comptabilité, l'Éducation, l'IT, le Juridique et la Qualité.
+* **Interface Bilingue Native** : Bascule instantanée entre le français et l'anglais pour l'ensemble des menus et des prompts générés.
+* **Boucle de Feedback** : Option pour forcer l'IA à demander des précisions avant de générer la réponse finale.
+
+### 🛠️ Structure du Projet
+* `index.html` : Portail central de navigation.
+* `general.html` : Constructeur de prompts universel.
+* `LePrompt[Métier].html` : Versions spécialisées par secteur d'activité.
 
 ---
 
-## 🚀 Fonctionnalités / Features
+## 🇺🇸 English: Pedagogical Guide
 
-### 🇫🇷 Français
-* **Interface Bilingue** : Basculez instantanément entre l'interface en français et en anglais.
-* **Structure Guidée** : Champs dédiés pour le Rôle, la Tâche, le Contexte, et les Contraintes.
-* **Personnalisation Avancée** :
-    * Sélection du **Ton** (Professionnel, Empathique, Créatif, etc.).
-    * Sélection du **Format** de sortie (Tableau, Code, Email, JSON, etc.).
-* **Prévisualisation en Temps Réel** :
-    * Vue **Markdown** pour le langage naturel.
-    * Vue **JSON** pour les intégrations techniques via API.
-* **Gestion des Pièces Jointes** : Simulation d'ajout de fichiers avec avertissements UX.
-* **Design Moderne** : Interface Material 3 stylisée avec Tailwind CSS.
+https://fabricefx.github.io/gemini-workspace-prompt-builder/
 
-### 🇬🇧 English
-* **Bilingual Interface**: Instantly toggle between French and English UI.
-* **Guided Structure**: Dedicated fields for Role, Task, Context, and Constraints.
-* **Advanced Customization**:
-    * **Tone** selection (Professional, Empathetic, Creative, etc.).
-    * **Output Format** selection (Table, Code, Email, JSON, etc.).
-* **Real-time Preview**:
-    * **Markdown** view for natural language.
-    * **JSON** view for technical API integrations.
-* **Attachment Handling**: File upload simulation with UX warnings.
-* **Modern Design**: Material 3 interface styled with Tailwind CSS.
+### 📝 Overview
+**Gemini Workspace Prompt Builder** is a tool designed to professionalize Generative AI usage in a business environment. It guides users through creating structured queries based on the 4-pillar method: **Persona**, **Task**, **Context**, and **Format**.
+
+### 🚀 New Features
+* **Dynamic Template Management**: Custom prompt saving within the browser's `localStorage`.
+* **Specialized Industry Libraries**: Dedicated interfaces for Procurement, Agriculture, Accounting, Education, IT, Legal, and Quality.
+* **Native Bilingual Interface**: Instant toggle between French and English for all menus and generated prompts.
+* **Feedback Loop**: Option to require the AI to ask clarifying questions before generating its final response.
 
 ---
 
-## 📦 Installation & usage
+## 📦 Installation & Déploiement
 
-### 1. Utilisation locale / Local Usage
-Le projet est conçu comme un fichier unique autonome.
-1. Téléchargez le fichier `index.html`.
-2. Ouvrez-le directement dans votre navigateur web (Chrome, Firefox, Edge).
-3. Aucune compilation n'est nécessaire (Tailwind est chargé via CDN).
+### 1. Google Apps Script (Recommandé)
+Pour une intégration parfaite dans Google Workspace :
+1.  Ouvrez [script.google.com](https://script.google.com).
+2.  Copiez le contenu de `Code.js` (fourni ci-dessous).
+3.  Créez un fichier HTML nommé `index` et collez-y le contenu de `index.html`.
+4.  Déployez en tant qu'**Application Web**.
 
+### 2. Utilisation Autonome
+Téléchargez le fichier HTML souhaité et ouvrez-le simplement dans votre navigateur.
+
+---
+
+## 👨‍💻 Auteur / Author
+**Fabrice Faucheux**
+*Expert en ingénierie de prompts et automatisation Google Workspace.*
+
+## ⚖️ Licence / License
+Ce projet est sous licence **MIT**.
