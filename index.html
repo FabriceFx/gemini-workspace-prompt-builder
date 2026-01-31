@@ -39,17 +39,19 @@
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
         
         .card-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             border-color: #0b57d0;
         }
+        /* Effet hover icon */
         .card-btn:hover .icon-circle {
-            background-color: #0b57d0; /* Fallback si pas de couleur spécifique */
+            background-color: #0b57d0; 
             color: white;
         }
+        /* Specific overrides for keeping original colors on hover could be added here if preferred */
         
         /* Language switcher active state */
         .lang-btn.active {
@@ -57,55 +59,75 @@
             font-weight: 700;
             background-color: #e3ecfa;
         }
+
+        /* Filter Buttons Styling */
+        .filter-btn {
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            background-color: #0b57d0;
+            color: white;
+            border-color: #0b57d0;
+        }
+        .filter-btn:not(.active):hover {
+            background-color: #e3ecfa;
+            color: #0b57d0;
+        }
     </style>
 </head>
-<body class="min-h-screen w-screen flex flex-col items-center justify-center p-4 relative">
+<body class="min-h-screen w-screen flex flex-col items-center p-4 relative">
 
-    <div class="absolute top-4 right-4 flex bg-white rounded-full shadow-sm border border-gray-200 p-1 fade-in">
+    <div class="absolute top-4 right-4 flex bg-white rounded-full shadow-sm border border-gray-200 p-1 fade-in z-50">
         <button onclick="setLanguage('fr')" id="btn-fr" class="lang-btn active px-3 py-1 rounded-full text-xs text-gray-600 hover:bg-gray-50 transition">FR</button>
         <button onclick="setLanguage('en')" id="btn-en" class="lang-btn px-3 py-1 rounded-full text-xs text-gray-600 hover:bg-gray-50 transition">EN</button>
     </div>
 
-    <div class="text-center mb-8 fade-in" style="animation-delay: 0.1s;">
+    <div class="text-center mt-8 mb-8 fade-in w-full" style="animation-delay: 0.1s;">
         <h1 class="text-4xl md:text-5xl font-normal text-[#1f1f1f] mb-3 tracking-tight">
             Prompt<span class="font-medium text-[#0b57d0]">Builder</span> Workspace
         </h1>
         <p class="text-gray-500 text-lg" data-translate="subtitle">Le créateur de prompts pour les pros</p>
     </div>
 
-    <div class="max-w-4xl w-full mb-10 fade-in bg-white rounded-3xl p-6 shadow-sm border border-blue-100" style="animation-delay: 0.15s;">
-        <h2 class="text-center text-xl font-medium text-gray-800 mb-6" data-translate="how_title">Comment ça marche ? (C'est un jeu d'enfant ! 🧸)</h2>
+    <div class="max-w-4xl w-full mb-8 fade-in bg-white rounded-3xl p-6 shadow-sm border border-blue-100" style="animation-delay: 0.15s;">
+        <h2 class="text-center text-xl font-medium text-gray-800 mb-6" data-translate="how_title">Comment ça marche ?</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3">
                     <i class="fas fa-cubes-stacked"></i>
                 </div>
-                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step1_title">1. Construis ta demande</h3>
-                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step1_text">Remplis les cases comme si tu assemblais des briques Lego. Plus c'est solide, mieux le robot comprendra !</p>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step1_title">1. Construis</h3>
+                <p class="text-sm text-gray-500" data-translate="how_step1_text">Remplis les briques.</p>
             </div>
-            
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-3">
                     <i class="fas fa-wand-magic-sparkles"></i>
                 </div>
-                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step2_title">2. Copie la magie</h3>
-                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step2_text">L'outil transforme tes briques en une super phrase. Clique juste pour copier ta recette magique.</p>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step2_title">2. Copie</h3>
+                <p class="text-sm text-gray-500" data-translate="how_step2_text">Récupère le prompt magique.</p>
             </div>
-
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl mb-3">
                     <i class="fas fa-robot"></i>
                 </div>
-                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step3_title">3. Donne au robot</h3>
-                <p class="text-sm text-gray-500 leading-relaxed" data-translate="how_step3_text">Colle ton texte dans Gemini, Claude ou ChatGPT. Il saura exactement quoi faire pour toi !</p>
+                <h3 class="font-semibold text-gray-800 mb-1" data-translate="how_step3_title">3. Génère</h3>
+                <p class="text-sm text-gray-500" data-translate="how_step3_text">Colle dans ton IA préférée.</p>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full fade-in mb-8" style="animation-delay: 0.2s;">
+    <div class="flex flex-wrap justify-center gap-2 mb-8 fade-in w-full max-w-4xl" style="animation-delay: 0.2s;">
+        <button onclick="filterCards('all')" class="filter-btn active px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_all">Tout voir</button>
+        <button onclick="filterCards('gestion')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_gestion">Gestion & Bureau</button>
+        <button onclick="filterCards('terrain')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_terrain">Terrain & Artisanat</button>
+        <button onclick="filterCards('tech')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_tech">Tech & Savoir</button>
+        <button onclick="filterCards('autre')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_other">Autre</button>
+    </div>
 
-        <a href="LePromptAchat.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+    <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full fade-in mb-8" style="animation-delay: 0.25s;">
+
+        <a href="LePromptAchat.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="gestion">
             <div class="icon-circle w-16 h-16 rounded-full bg-orange-50 text-orange-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-cart-shopping"></i>
             </div>
@@ -113,15 +135,7 @@
             <p class="text-sm text-gray-500" data-translate="card_achat_desc">Négociation, fournisseurs et appels d'offres.</p>
         </a>
 
-        <a href="LePromptAgricole.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
-            <div class="icon-circle w-16 h-16 rounded-full bg-green-50 text-green-700 flex items-center justify-center text-2xl mb-4 transition-colors">
-                <i class="fas fa-tractor"></i>
-            </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_agri_title">Agricole</h3>
-            <p class="text-sm text-gray-500" data-translate="card_agri_desc">Gestion d'exploitation, PAC et cultures.</p>
-        </a>
-
-        <a href="LePromptComptable.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+        <a href="LePromptComptable.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="gestion">
             <div class="icon-circle w-16 h-16 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-calculator"></i>
             </div>
@@ -129,7 +143,39 @@
             <p class="text-sm text-gray-500" data-translate="card_compta_desc">Bilans, audits financiers et fiscalité.</p>
         </a>
 
-        <a href="LePromptEducation.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+        <a href="LePromptJuridique.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="gestion">
+            <div class="icon-circle w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-scale-balanced"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_legal_title">Juridique</h3>
+            <p class="text-sm text-gray-500" data-translate="card_legal_desc">Contrats, veilles réglementaires et mémos.</p>
+        </a>
+
+        <a href="LePromptQualite.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="gestion">
+            <div class="icon-circle w-16 h-16 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_quality_title">Qualité</h3>
+            <p class="text-sm text-gray-500" data-translate="card_quality_desc">Normes ISO, audits et amélioration.</p>
+        </a>
+
+        <a href="LePromptAgricole.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="terrain">
+            <div class="icon-circle w-16 h-16 rounded-full bg-green-50 text-green-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-tractor"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_agri_title">Agricole</h3>
+            <p class="text-sm text-gray-500" data-translate="card_agri_desc">Gestion d'exploitation, PAC et cultures.</p>
+        </a>
+
+        <a href="LePromptPeintreDecorateur.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="terrain">
+            <div class="icon-circle w-16 h-16 rounded-full bg-pink-50 text-pink-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-paint-roller"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_peintre_title">Peintre & Déco</h3>
+            <p class="text-sm text-gray-500" data-translate="card_peintre_desc">Couleurs, métrés et devis travaux.</p>
+        </a>
+
+        <a href="LePromptEducation.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="tech">
             <div class="icon-circle w-16 h-16 rounded-full bg-yellow-50 text-yellow-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-graduation-cap"></i>
             </div>
@@ -137,7 +183,7 @@
             <p class="text-sm text-gray-500" data-translate="card_edu_desc">Pédagogie, cours et évaluations.</p>
         </a>
 
-        <a href="LePromptIT.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+        <a href="LePromptIT.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="tech">
             <div class="icon-circle w-16 h-16 rounded-full bg-indigo-50 text-indigo-700 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-laptop-code"></i>
             </div>
@@ -145,31 +191,7 @@
             <p class="text-sm text-gray-500" data-translate="card_it_desc">Développement, infrastructure et support.</p>
         </a>
 
-        <a href="LePromptJuridique.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
-            <div class="icon-circle w-16 h-16 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl mb-4 transition-colors">
-                <i class="fas fa-scale-balanced"></i>
-            </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_legal_title">Juridique</h3>
-            <p class="text-sm text-gray-500" data-translate="card_legal_desc">Contrats, veilles réglementaires et mémos.</p>
-        </a>
-        
-        <a href="LePromptPeintreDecorateur.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
-            <div class="icon-circle w-16 h-16 rounded-full bg-pink-50 text-pink-700 flex items-center justify-center text-2xl mb-4 transition-colors hover:bg-pink-700 hover:text-white">
-                <i class="fas fa-paint-roller"></i>
-            </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_peintre_title">Peintre & Déco</h3>
-            <p class="text-sm text-gray-500" data-translate="card_peintre_desc">Couleurs, métrés et devis travaux.</p>
-        </a>
-
-        <a href="LePromptQualite.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
-            <div class="icon-circle w-16 h-16 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center text-2xl mb-4 transition-colors">
-                <i class="fas fa-clipboard-check"></i>
-            </div>
-            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_quality_title">Qualité</h3>
-            <p class="text-sm text-gray-500" data-translate="card_quality_desc">Normes ISO, audits et amélioration continue.</p>
-        </a>
-
-        <a href="general.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+        <a href="general.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="autre">
             <div class="icon-circle w-16 h-16 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-wand-magic-sparkles"></i>
             </div>
@@ -179,14 +201,14 @@
 
     </div>
 
-    <div class="text-center fade-in bg-white/50 p-4 rounded-2xl border border-dashed border-gray-300 max-w-xl mx-auto mb-4" style="animation-delay: 0.25s;">
+    <div class="text-center fade-in bg-white/50 p-4 rounded-2xl border border-dashed border-gray-300 max-w-xl mx-auto mb-4 w-full" style="animation-delay: 0.3s;">
         <p class="text-sm text-gray-600 mb-2" data-translate="contact_text">Vous ne trouvez pas votre métier ?</p>
         <a href="mailto:contact@atelier-informatique.com?subject=Suggestion%20de%20nouveau%20modèle%20PromptBuilder" class="text-[#0b57d0] font-medium hover:underline inline-flex items-center gap-2">
             <i class="far fa-envelope"></i> <span data-translate="contact_link">Demander un nouveau modèle</span>
         </a>
     </div>
 
-    <footer class="mt-8 text-center fade-in pb-4" style="animation-delay: 0.3s;">
+    <footer class="mt-8 text-center fade-in pb-4" style="animation-delay: 0.35s;">
         <p class="text-xs text-gray-500 mb-3">
             <span data-translate="footer_dev">Développé par</span> <strong class="text-gray-700">Fabrice Faucheux</strong>
         </p>
@@ -196,36 +218,42 @@
     </footer>
 
     <script>
+        // --- TRANSLATIONS ---
         const translations = {
             fr: {
                 subtitle: "Le créateur de prompts pour les pros",
-                // Section pédagogique
-                how_title: "Comment ça marche ? (C'est un jeu d'enfant ! 🧸)",
-                how_step1_title: "1. Construis ta demande",
-                how_step1_text: "Remplis les cases comme si tu assemblais des briques Lego. Plus c'est solide, mieux le robot comprendra !",
-                how_step2_title: "2. Copie la magie",
-                how_step2_text: "L'outil transforme tes briques en une super phrase. Clique juste pour copier ta recette magique.",
-                how_step3_title: "3. Donne au robot",
-                how_step3_text: "Colle ton texte dans Gemini, Claude ou ChatGPT. Il saura exactement quoi faire pour toi !",
-                // Cartes
+                how_title: "Comment ça marche ?",
+                how_step1_title: "1. Construis",
+                how_step1_text: "Remplis les briques.",
+                how_step2_title: "2. Copie",
+                how_step2_text: "Récupère le prompt.",
+                how_step3_title: "3. Génère",
+                how_step3_text: "Colle dans l'IA.",
+                // Tabs
+                tab_all: "Tout voir",
+                tab_gestion: "Gestion & Bureau",
+                tab_terrain: "Terrain & Artisanat",
+                tab_tech: "Tech & Savoir",
+                tab_other: "Autre",
+                // Cards
                 card_achat_title: "Achats",
-                card_achat_desc: "Négociation, fournisseurs et appels d'offres.",
+                card_achat_desc: "Négociation, fournisseurs.",
                 card_agri_title: "Agricole",
-                card_agri_desc: "Gestion d'exploitation, PAC et cultures.",
+                card_agri_desc: "Exploitation & PAC.",
                 card_compta_title: "Comptable",
-                card_compta_desc: "Bilans, audits financiers et fiscalité.",
+                card_compta_desc: "Bilans & fiscalité.",
                 card_edu_title: "Éducation",
-                card_edu_desc: "Pédagogie, cours et évaluations.",
+                card_edu_desc: "Pédagogie & cours.",
                 card_it_title: "IT & Tech",
-                card_it_desc: "Développement, infrastructure et support.",
+                card_it_desc: "Code & Infra.",
                 card_legal_title: "Juridique",
-                card_legal_desc: "Contrats, veilles réglementaires et mémos.",
+                card_legal_desc: "Contrats & lois.",
                 card_peintre_title: "Peintre & Déco",
-                card_peintre_desc: "Couleurs, métrés et devis travaux.",
+                card_peintre_desc: "Couleurs & chantiers.",
                 card_quality_title: "Qualité",
-                card_quality_desc: "Normes ISO, audits et amélioration continue.",
+                card_quality_desc: "Normes & Audits.",
                 card_general_title: "Général",
-                card_general_desc: "Création libre pour tous les autres usages.",
+                card_general_desc: "Création libre.",
                 // Contact & Footer
                 contact_text: "Vous ne trouvez pas votre métier ?",
                 contact_link: "Demander un nouveau modèle",
@@ -234,42 +262,50 @@
             },
             en: {
                 subtitle: "The prompt builder for pros",
-                // Pedagogical section
-                how_title: "How does it work? (It's child's play! 🧸)",
-                how_step1_title: "1. Build your request",
-                how_step1_text: "Fill in the boxes like stacking Lego bricks. The stronger it is, the better the robot understands!",
-                how_step2_title: "2. Copy the magic",
-                how_step2_text: "The tool turns your bricks into a super sentence. Just click to copy your magic recipe.",
-                how_step3_title: "3. Give to the robot",
-                how_step3_text: "Paste your text into Gemini, Claude, or ChatGPT. It will know exactly what to do for you!",
+                how_title: "How does it work?",
+                how_step1_title: "1. Build",
+                how_step1_text: "Fill in blocks.",
+                how_step2_title: "2. Copy",
+                how_step2_text: "Get the prompt.",
+                how_step3_title: "3. Generate",
+                how_step3_text: "Paste into AI.",
+                // Tabs
+                tab_all: "View All",
+                tab_gestion: "Business & Office",
+                tab_terrain: "Field & Craft",
+                tab_tech: "Tech & Knowledge",
+                tab_other: "Other",
                 // Cards
                 card_achat_title: "Purchasing",
-                card_achat_desc: "Negotiation, suppliers and tenders.",
+                card_achat_desc: "Negotiation, suppliers.",
                 card_agri_title: "Agriculture",
-                card_agri_desc: "Farm management, CAP and crop monitoring.",
+                card_agri_desc: "Farming & CAP.",
                 card_compta_title: "Accounting",
-                card_compta_desc: "Balance sheets, financial audits and tax.",
+                card_compta_desc: "Balance sheets & tax.",
                 card_edu_title: "Education",
-                card_edu_desc: "Pedagogy, courses and evaluations.",
+                card_edu_desc: "Teaching & courses.",
                 card_it_title: "IT & Tech",
-                card_it_desc: "Development, infrastructure and support.",
+                card_it_desc: "Code & Infra.",
                 card_legal_title: "Legal",
-                card_legal_desc: "Contracts, regulatory monitoring and memos.",
+                card_legal_desc: "Contracts & laws.",
                 card_peintre_title: "Painter & Deco",
-                card_peintre_desc: "Colors, measurements and work quotes.",
+                card_peintre_desc: "Colors & sites.",
                 card_quality_title: "Quality",
-                card_quality_desc: "ISO standards, audits and continuous improvement.",
+                card_quality_desc: "Standards & Audits.",
                 card_general_title: "General",
-                card_general_desc: "Free creation for all other uses.",
+                card_general_desc: "Free creation.",
                 // Contact & Footer
-                contact_text: "Can't find your profession?",
-                contact_link: "Request a new model",
+                contact_text: "Can't find your job?",
+                contact_link: "Request a model",
                 footer_dev: "Developed by",
                 footer_tip: "Send a tip"
             }
         };
 
+        let currentLang = 'fr';
+
         function setLanguage(lang) {
+            currentLang = lang;
             // Update texts
             document.querySelectorAll('[data-translate]').forEach(el => {
                 const key = el.getAttribute('data-translate');
@@ -277,15 +313,40 @@
                     el.textContent = translations[lang][key];
                 }
             });
-
             // Update buttons state
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + lang).classList.add('active');
-            
             // Update HTML lang attribute
             document.documentElement.lang = lang;
         }
-    </script>
 
+        // --- FILTERING LOGIC ---
+        function filterCards(category) {
+            const cards = document.querySelectorAll('.card-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // 1. Update Buttons State
+            buttons.forEach(btn => btn.classList.remove('active'));
+            // Find the button that triggered this or matches the category logic
+            // Simple way: rely on onclick argument match. 
+            // We iterate buttons to find which one has the onclick matching the category
+            Array.from(buttons).find(b => b.getAttribute('onclick').includes(`'${category}'`)).classList.add('active');
+
+            // 2. Filter Cards
+            cards.forEach(card => {
+                const cardCat = card.getAttribute('data-category');
+                
+                if (category === 'all' || cardCat === category) {
+                    card.classList.remove('hidden');
+                    // Add a tiny animation to re-appearing items
+                    card.classList.add('fade-in'); 
+                    card.style.animationDelay = '0s';
+                } else {
+                    card.classList.add('hidden');
+                    card.classList.remove('fade-in');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
