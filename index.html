@@ -47,7 +47,7 @@
             border-color: #0b57d0;
         }
         .card-btn:hover .icon-circle {
-            background-color: #0b57d0;
+            background-color: #0b57d0; /* Fallback si pas de couleur spécifique */
             color: white;
         }
         
@@ -152,6 +152,14 @@
             <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_legal_title">Juridique</h3>
             <p class="text-sm text-gray-500" data-translate="card_legal_desc">Contrats, veilles réglementaires et mémos.</p>
         </a>
+        
+        <a href="LePromptPeintreDecorateur.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
+            <div class="icon-circle w-16 h-16 rounded-full bg-pink-50 text-pink-700 flex items-center justify-center text-2xl mb-4 transition-colors hover:bg-pink-700 hover:text-white">
+                <i class="fas fa-paint-roller"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_peintre_title">Peintre & Déco</h3>
+            <p class="text-sm text-gray-500" data-translate="card_peintre_desc">Couleurs, métrés et devis travaux.</p>
+        </a>
 
         <a href="LePromptQualite.html" class="card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none">
             <div class="icon-circle w-16 h-16 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center text-2xl mb-4 transition-colors">
@@ -212,6 +220,8 @@
                 card_it_desc: "Développement, infrastructure et support.",
                 card_legal_title: "Juridique",
                 card_legal_desc: "Contrats, veilles réglementaires et mémos.",
+                card_peintre_title: "Peintre & Déco",
+                card_peintre_desc: "Couleurs, métrés et devis travaux.",
                 card_quality_title: "Qualité",
                 card_quality_desc: "Normes ISO, audits et amélioration continue.",
                 card_general_title: "Général",
@@ -245,6 +255,8 @@
                 card_it_desc: "Development, infrastructure and support.",
                 card_legal_title: "Legal",
                 card_legal_desc: "Contracts, regulatory monitoring and memos.",
+                card_peintre_title: "Painter & Deco",
+                card_peintre_desc: "Colors, measurements and work quotes.",
                 card_quality_title: "Quality",
                 card_quality_desc: "ISO standards, audits and continuous improvement.",
                 card_general_title: "General",
@@ -273,9 +285,6 @@
             // Update HTML lang attribute
             document.documentElement.lang = lang;
         }
-
-        // Initialize (optional: auto-detect browser language or default to FR)
-        // setLanguage('fr'); 
     </script>
 
 </body>
