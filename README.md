@@ -33,10 +33,17 @@ L'outil affiche en temps réel le prompt généré, en Markdown ou en JSON, prê
 
 ## Fonctionnalités
 
-- **8 bibliothèques métier + un constructeur universel** — chaque métier fournit
+- **11 bibliothèques métier + un constructeur universel** — chaque métier fournit
   ses modèles pré-remplis, ses tons et ses formats adaptés au vocabulaire du secteur.
 - **Modèles personnalisés** — enregistrement de ses propres prompts dans le
-  `localStorage` du navigateur (chaque bibliothèque a son espace de stockage).
+  `localStorage` du navigateur (chaque bibliothèque a son espace de stockage),
+  avec **export et import en JSON** pour les transférer d'un poste à l'autre ou
+  les partager au sein d'une équipe.
+- **Bandeau de complétude** — signale en direct les piliers laissés vides, pour
+  éviter les demandes trop maigres dont la réponse sera générique.
+- **Lien de partage** — copie une URL contenant le prompt, pour l'envoyer à un
+  collègue. Le contenu voyage dans le lien : l'outil demande confirmation et
+  déconseille cet usage pour des données confidentielles.
 - **Interface bilingue FR/EN** — bascule instantanée des libellés *et* du prompt
   généré. La langue du navigateur est détectée au chargement.
 - **Boucle de feedback** — option demandant à l'IA de poser ses questions de
@@ -48,7 +55,7 @@ L'outil affiche en temps réel le prompt généré, en Markdown ou en JSON, prê
 
 ## Architecture
 
-Un **moteur unique** sert les neuf pages du constructeur. Les pages ne
+Un **moteur unique** sert les douze pages du constructeur. Les pages ne
 contiennent aucune logique : elles déclarent leurs métadonnées, chargent leur
 bibliothèque métier, et le moteur construit l'interface.
 
@@ -57,14 +64,17 @@ index.html                      Portail de navigation
 guide.html                      Guide pédagogique pour débutants
 
 general.html                    ┐
-LePromptAchat.html              │ 9 pages du constructeur,
-LePromptAgricole.html           │ ~50 lignes chacune :
-LePromptComptable.html          │ métadonnées + 2 balises <script>
-LePromptEducation.html          │
+LePromptAchat.html              │
+LePromptAgricole.html           │ 12 pages du constructeur,
+LePromptCommercial.html         │ ~37 lignes chacune :
+LePromptComptable.html          │ métadonnées + feuille de style
+LePromptEducation.html          │ + bibliothèque + moteur
 LePromptIT.html                 │
 LePromptJuridique.html          │
+LePromptMarketing.html          │
 LePromptPeintreDecorateur.html  │
-LePromptQualite.html            ┘
+LePromptQualite.html            │
+LePromptRH.html                 ┘
 
 assets/
   builder.js                    Le moteur : toute la logique, une seule fois
@@ -163,6 +173,9 @@ disparaissent si l'utilisateur vide les données du site.
   doit être fourni à l'IA séparément.
 - Le moteur construit l'interface en JavaScript ; sans JS, les pages du
   constructeur affichent un message de repli vers le portail.
+- Un lien de partage encode le prompt dans le fragment d'URL. Ce fragment n'est
+  jamais transmis au serveur, mais le lien lui-même circule dans des messageries
+  qui l'archivent : à réserver aux prompts sans données sensibles.
 
 ## Contribuer
 
@@ -196,10 +209,16 @@ Gemini, Claude, ChatGPT or any other assistant.
 
 ### Features
 
-- **8 industry libraries plus a universal builder** — each industry ships its own
+- **11 industry libraries plus a universal builder** — each industry ships its own
   pre-filled templates, tones and output formats matching its vocabulary.
 - **Custom templates** — save your own prompts to the browser's `localStorage`
-  (each library has its own storage namespace).
+  (each library has its own storage namespace), with **JSON export and import**
+  to move them between machines or share them across a team.
+- **Completeness banner** — flags which pillars are still empty, so thin requests
+  that would yield generic answers get caught early.
+- **Shareable link** — copies a URL containing the prompt. The content travels
+  inside the link, so the tool asks for confirmation and advises against it for
+  confidential data.
 - **Bilingual FR/EN interface** — instantly switches both the UI labels and the
   generated prompt. Browser language is detected on load.
 - **Feedback loop** — optionally instructs the AI to ask clarifying questions
@@ -211,7 +230,7 @@ Gemini, Claude, ChatGPT or any other assistant.
 
 ### Architecture
 
-A **single engine** (`assets/builder.js`) powers all nine builder pages. Each
+A **single engine** (`assets/builder.js`) powers all twelve builder pages. Each
 page only declares its metadata and loads its industry library from
 `assets/libraries/`; the engine builds the interface from there. Adding an
 industry means adding one data file and one short page — the engine never
