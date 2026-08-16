@@ -118,11 +118,11 @@
     </div>
 
     <div class="flex flex-wrap justify-center gap-2 mb-8 fade-in w-full max-w-4xl" style="animation-delay: 0.2s;">
-        <button onclick="filterCards('all')" class="filter-btn active px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_all">Tout voir</button>
-        <button onclick="filterCards('gestion')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_gestion">Gestion & Bureau</button>
-        <button onclick="filterCards('terrain')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_terrain">Terrain & Artisanat</button>
-        <button onclick="filterCards('tech')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_tech">Tech & Savoir</button>
-        <button onclick="filterCards('autre')" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_other">Autre</button>
+        <button type="button" onclick="filterCards('all')" data-filter="all" class="filter-btn active px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_all">Tout voir</button>
+        <button type="button" onclick="filterCards('gestion')" data-filter="gestion" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_gestion">Gestion & Bureau</button>
+        <button type="button" onclick="filterCards('terrain')" data-filter="terrain" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_terrain">Terrain & Artisanat</button>
+        <button type="button" onclick="filterCards('tech')" data-filter="tech" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_tech">Tech & Savoir</button>
+        <button type="button" onclick="filterCards('autre')" data-filter="autre" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_other">Autre</button>
     </div>
 
     <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full fade-in mb-8" style="animation-delay: 0.25s;">
@@ -326,11 +326,7 @@
             const buttons = document.querySelectorAll('.filter-btn');
 
             // 1. Update Buttons State
-            buttons.forEach(btn => btn.classList.remove('active'));
-            // Find the button that triggered this or matches the category logic
-            // Simple way: rely on onclick argument match. 
-            // We iterate buttons to find which one has the onclick matching the category
-            Array.from(buttons).find(b => b.getAttribute('onclick').includes(`'${category}'`)).classList.add('active');
+            buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.filter === category));
 
             // 2. Filter Cards
             cards.forEach(card => {

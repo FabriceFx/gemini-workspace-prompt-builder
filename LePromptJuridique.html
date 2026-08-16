@@ -644,25 +644,32 @@
             const select = document.getElementById('template-selector');
             const currentVal = select.value;
 
-            let html = `<option value="">${t.lbl_template_default}</option>`;
-            
+            const makeOption = (value, label) => {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = label;
+                return opt;
+            };
+
+            select.innerHTML = '';
+            select.appendChild(makeOption('', t.lbl_template_default));
+
             // Group 1: Default
-            html += `<optgroup label="${t.lbl_group_default}">`;
+            const groupDefault = document.createElement('optgroup');
+            groupDefault.label = t.lbl_group_default;
             for (const key in defaultTemplates) {
-                html += `<option value="${key}">${defaultTemplates[key][state.lang].name}</option>`;
+                groupDefault.appendChild(makeOption(key, defaultTemplates[key][state.lang].name));
             }
-            html += `</optgroup>`;
+            select.appendChild(groupDefault);
 
-            // Group 2: Custom
+            // Group 2: Custom (les noms viennent de l'utilisateur : jamais de concaténation HTML)
             if (customTemplates.length > 0) {
-                html += `<optgroup label="${t.lbl_group_custom}">`;
-                customTemplates.forEach(tpl => {
-                    html += `<option value="${tpl.id}">${tpl.name}</option>`;
-                });
-                html += `</optgroup>`;
+                const groupCustom = document.createElement('optgroup');
+                groupCustom.label = t.lbl_group_custom;
+                customTemplates.forEach(tpl => groupCustom.appendChild(makeOption(tpl.id, tpl.name)));
+                select.appendChild(groupCustom);
             }
 
-            select.innerHTML = html;
             select.value = currentVal; // Restore selection if exists
         }
 
@@ -683,8 +690,7 @@
             } else {
                 // Load Default
                 if (defaultTemplates[key]) {
-                    tplData = defaultTemplates[key][state.lang];
-                    tplData.feedback = false; 
+                    tplData = { ...defaultTemplates[key][state.lang], feedback: false };
                 }
                 btnDelete.classList.add('hidden');
             }
@@ -721,7 +727,20 @@
             const container = document.getElementById('instructions-container');
             const div = document.createElement('div');
             div.className = 'flex items-center gap-2 animate-[fadeIn_0.2s]';
-            div.innerHTML = `<input type="text" class="flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-red-500" value="${value}" oninput="updateOutput()"><button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>`;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'flex-grow bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:border-red-500';
+            input.value = value;
+            input.addEventListener('input', updateOutput);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'text-gray-400 hover:text-red-500';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.addEventListener('click', () => { div.remove(); updateOutput(); });
+
+            div.append(input, removeBtn);
             container.appendChild(div);
         }
 
@@ -785,7 +804,23 @@
         function renderFiles() {
             const c = document.getElementById('file-list'); c.innerHTML = '';
             state.files.forEach((f, i) => {
-                c.innerHTML += `<div class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2"><i class="fas fa-file"></i> ${f.name} <button onclick="removeFile(${i})" class="text-red-500 hover:text-red-700">&times;</button></div>`;
+                const chip = document.createElement('div');
+                chip.className = 'bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs flex items-center gap-2';
+
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-file';
+
+                const label = document.createElement('span');
+                label.textContent = f.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'text-red-500 hover:text-red-700';
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => removeFile(i));
+
+                chip.append(icon, label, removeBtn);
+                c.appendChild(chip);
             });
         }
         function removeFile(i) { state.files.splice(i, 1); renderFiles(); updateOutput(); }

@@ -772,14 +772,24 @@
             const container = document.getElementById('instructions-container');
             const div = document.createElement('div');
             div.className = "flex items-center gap-2 animate-[fadeIn_0.2s]";
-            div.innerHTML = `
-                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-                <input type="text" class="m3-input instruction-input border-b border-gray-200 focus:border-pink-500 py-2 px-1 text-sm" 
-                       value="${value}" placeholder="${currentLang === 'fr' ? 'Instruction précise...' : 'Precise instruction...'}" oninput="updateOutput()">
-                <button onclick="this.parentElement.remove(); updateOutput()" class="text-gray-300 hover:text-red-400 w-6 h-6 flex items-center justify-center transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
+
+            const chevron = document.createElement('i');
+            chevron.className = "fas fa-chevron-right text-gray-300 text-xs";
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = "m3-input instruction-input border-b border-gray-200 focus:border-pink-500 py-2 px-1 text-sm";
+            input.value = value;
+            input.placeholder = currentLang === 'fr' ? 'Instruction précise...' : 'Precise instruction...';
+            input.addEventListener('input', updateOutput);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = "text-gray-300 hover:text-red-400 w-6 h-6 flex items-center justify-center transition";
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.addEventListener('click', () => { div.remove(); updateOutput(); });
+
+            div.append(chevron, input, removeBtn);
             container.appendChild(div);
         }
 
@@ -792,11 +802,22 @@
                 
                 const tag = document.createElement('div');
                 tag.className = "inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs animate-[fadeIn_0.2s] border border-gray-200";
-                tag.innerHTML = `
-                    <i class="far fa-file"></i>
-                    <span class="max-w-[100px] truncate">${file.name}</span>
-                    <button onclick="removeFile('${file.name}', this)" class="text-gray-400 hover:text-red-500 ml-1"><i class="fas fa-times"></i></button>
-                `;
+
+                const icon = document.createElement('i');
+                icon.className = "far fa-file";
+
+                const label = document.createElement('span');
+                label.className = "max-w-[100px] truncate";
+                label.textContent = file.name;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = "text-gray-400 hover:text-red-500 ml-1";
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                // On cible l'objet File lui-même : deux fichiers homonymes restent distincts.
+                removeBtn.addEventListener('click', () => removeFile(file, tag));
+
+                tag.append(icon, label, removeBtn);
                 list.appendChild(tag);
             });
             
@@ -807,9 +828,9 @@
             updateOutput();
         }
 
-        function removeFile(name, btnElement) {
-            uploadedFiles = uploadedFiles.filter(f => f.name !== name);
-            btnElement.parentElement.remove();
+        function removeFile(file, tagElement) {
+            uploadedFiles = uploadedFiles.filter(f => f !== file);
+            tagElement.remove();
             if (uploadedFiles.length === 0) {
                 document.getElementById('file-warning').classList.add('hidden');
             }
