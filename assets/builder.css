@@ -1,0 +1,150 @@
+/* Styles communs à toutes les pages du constructeur.
+   Les couleurs viennent des variables posées par la bibliothèque métier
+   (assets/libraries/<slug>.js) : ce fichier ne connaît aucun métier. */
+
+:root {
+    --accent: #0b57d0;          /* couleur principale du métier */
+    --surface: #f0f4f9;         /* fond de page */
+    --tint: #e8edfa;            /* aplat clair dérivé de l'accent */
+    --on-tint: #041e49;         /* texte lisible sur --tint */
+
+    --outline: #747775;
+    --outline-soft: #c4c7c5;
+    --on-surface: #1f1f1f;
+    --on-surface-muted: #444746;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Google Sans Flex', 'Outfit', system-ui, sans-serif;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    overscroll-behavior-y: none;
+}
+
+/* --- Champs Material 3 -------------------------------------------------- */
+.m3-field {
+    position: relative;
+    background-color: var(--surface);
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid var(--outline);
+    transition: all 0.2s;
+}
+.m3-field:focus-within {
+    background-color: var(--tint);
+    border-bottom: 2px solid var(--accent);
+}
+.m3-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 24px 16px 8px 16px;
+    outline: none;
+    font-size: 1rem;
+    color: var(--on-surface);
+    line-height: 1.5;
+    font-family: inherit;
+}
+.m3-input:not(:focus)::placeholder { opacity: 0; transition: opacity 0.2s; }
+.m3-label {
+    position: absolute;
+    left: 16px;
+    top: 18px;
+    font-size: 1rem;
+    color: var(--on-surface-muted);
+    pointer-events: none;
+    transition: 0.2s ease all;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.m3-input:focus ~ .m3-label,
+.m3-input:not(:placeholder-shown) ~ .m3-label {
+    top: 6px;
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* --- Case à cocher ------------------------------------------------------ */
+.m3-checkbox-container { display: flex; align-items: center; cursor: pointer; padding: 8px 0; }
+.m3-checkbox {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+    border: 2px solid var(--outline);
+    border-radius: 2px;
+    display: grid;
+    place-content: center;
+    margin-right: 12px;
+    transition: 0.2s all;
+}
+.m3-checkbox::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em white;
+    transform-origin: center;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.m3-checkbox:checked { background-color: var(--accent); border-color: var(--accent); }
+.m3-checkbox:checked::before { transform: scale(1); }
+
+/* --- Coloration JSON & barres de défilement ----------------------------- */
+.json-key { color: #f28b82; }
+.json-string { color: #a5d6a7; }
+.json-number, .json-boolean { color: #90caf9; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--outline-soft); border-radius: 4px; }
+
+/* --- Onglets d'aperçu --------------------------------------------------- */
+.tab-active { background-color: var(--tint); color: var(--on-tint); font-weight: 600; }
+.tab-inactive { background-color: transparent; color: var(--on-surface-muted); }
+
+/* --- Navigation mobile -------------------------------------------------- */
+.mobile-nav-btn.active { color: var(--accent); background-color: var(--tint); }
+
+/* --- Sélecteur de modèles ----------------------------------------------- */
+.template-select-wrapper { position: relative; }
+.template-select {
+    appearance: none;
+    padding-right: 2rem;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- Modale ------------------------------------------------------------- */
+.modal-backdrop { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); }
+
+/* --- Divers ------------------------------------------------------------- */
+.accent { color: var(--accent); }
+.accent-bg { background-color: var(--accent); }
+.accent-border:focus { border-color: var(--accent); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+
+/* Respecte le réglage système « réduire les animations ». */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Repère de focus visible au clavier, absent des pages d'origine. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
