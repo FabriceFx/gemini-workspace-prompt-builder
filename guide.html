@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Comprendre en 5 minutes pourquoi vos demandes à l'IA donnent des réponses décevantes, et comment le Prompt Builder y remédie. Guide sans jargon.">
+    <title>Guide du débutant — PromptBuilder</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230b57d0'/><text x='16' y='23' font-family='sans-serif' font-size='20' font-weight='600' fill='white' text-anchor='middle'>P</text></svg>">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="PromptBuilder Workspace">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:url" content="https://fabricefx.github.io/gemini-workspace-prompt-builder/guide.html">
+    <meta property="og:title" content="Guide du débutant">
+    <meta property="og:description" content="Pourquoi l'IA vous répond à côté, et comment poser une bonne question. Guide sans jargon, en 5 minutes.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Guide du débutant">
+    <meta name="twitter:description" content="Pourquoi l'IA vous répond à côté, et comment poser une bonne question. Guide sans jargon, en 5 minutes.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@8..144,100..1000&family=Outfit:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --accent: #0b57d0; --surface: #f0f4f9; }
+        body {
+            font-family: 'Google Sans Flex', 'Outfit', system-ui, sans-serif;
+            background-color: var(--surface);
+            color: #1f1f1f;
+        }
+        .prose-lead { font-size: 1.125rem; line-height: 1.75; color: #444746; }
+        .card { background: #fff; border-radius: 1.5rem; border: 1px solid #e5e7eb; }
+        .mono { font-family: 'Roboto Mono', ui-monospace, monospace; }
+
+        /* Numéro d'étape */
+        .step-num {
+            width: 2rem; height: 2rem; flex: none;
+            border-radius: 9999px;
+            background: var(--accent); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.875rem;
+        }
+
+        /* Ancres de sommaire : évite que le titre passe sous l'en-tête collant */
+        .anchor { scroll-margin-top: 5rem; }
+
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .card { border-color: #ccc; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200 no-print">
+    <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <a href="index.html" class="text-sm text-gray-600 hover:text-[color:var(--accent)] inline-flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> <span>Retour au portail</span>
+        </a>
+        <span class="text-sm font-medium text-gray-800">Guide du débutant</span>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-10 md:py-16">
+
+    <!-- ---------------------------------------------------------------- -->
+    <h1 class="text-3xl md:text-5xl font-normal tracking-tight mb-5">
+        L'IA ne vous répond pas mal.<br>
+        <span class="font-medium text-[color:var(--accent)]">Elle répond à la question posée.</span>
+    </h1>
+    <p class="prose-lead max-w-2xl mb-4">
+        Si vous avez déjà essayé un assistant comme Gemini, Claude ou ChatGPT et trouvé
+        la réponse creuse, générique ou hors sujet, le problème vient rarement de l'outil.
+        Il vient de ce qu'on lui a donné pour travailler.
+    </p>
+    <p class="prose-lead max-w-2xl mb-10">
+        Cette page explique, sans jargon et en cinq minutes, pourquoi — et comment le
+        <strong>PromptBuilder</strong> vous fait poser une bonne question sans avoir à
+        devenir expert du sujet.
+    </p>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="pourquoi">
+        <h2 class="text-2xl font-medium mb-4">Le vrai problème, en une image</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">
+            Imaginez que vous confiez un travail à un intérimaire très compétent, mais qui
+            débarque le matin même : il ne connaît ni votre entreprise, ni vos clients, ni vos
+            habitudes. S'il ne sait pas <em>qui il est censé être</em>, <em>pour qui</em> il
+            travaille et <em>sous quelle forme</em> vous voulez le résultat, il produira quelque
+            chose de correct… et d'inutilisable.
+        </p>
+        <div class="card p-5 border-l-4 border-l-amber-400 bg-amber-50/40 max-w-2xl">
+            <p class="text-gray-700">
+                <strong>Une IA, c'est exactement cet intérimaire.</strong> Elle a d'énormes
+                connaissances générales et zéro connaissance de votre contexte. Tout ce que vous
+                ne dites pas, elle doit l'inventer — et elle invente en moyenne, c'est-à-dire de
+                façon passe-partout.
+            </p>
+        </div>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="avant-apres">
+        <h2 class="text-2xl font-medium mb-2">Avant / après, sur un cas réel</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">
+            Même demande de fond, deux formulations. Regardez la différence de matière
+            que l'IA reçoit.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-5">
+            <div class="card p-5 border-l-4 border-l-red-300">
+                <div class="flex items-center gap-2 mb-3 text-red-700">
+                    <i class="fas fa-circle-xmark"></i>
+                    <span class="font-semibold text-sm uppercase tracking-wide">La demande spontanée</span>
+                </div>
+                <p class="mono text-sm bg-gray-50 rounded-lg p-3 text-gray-800 mb-4">
+                    Écris un mail à mon fournisseur pour le retard.
+                </p>
+                <p class="text-sm text-gray-600 mb-2 font-medium">Ce que l'IA doit deviner :</p>
+                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                    <li>Vous êtes acheteur ? juriste ? dirigeant ?</li>
+                    <li>Le retard est-il grave, répété, contractuel ?</li>
+                    <li>Faut-il être conciliant ou menacer de pénalités ?</li>
+                    <li>Un mail de trois lignes ou un courrier formel ?</li>
+                </ul>
+                <p class="text-sm text-red-800 mt-4 font-medium">
+                    Résultat : un mail poli, vague, que vous réécrirez entièrement.
+                </p>
+            </div>
+
+            <div class="card p-5 border-l-4 border-l-green-400">
+                <div class="flex items-center gap-2 mb-3 text-green-700">
+                    <i class="fas fa-circle-check"></i>
+                    <span class="font-semibold text-sm uppercase tracking-wide">La demande construite</span>
+                </div>
+                <div class="mono text-sm bg-gray-50 rounded-lg p-3 text-gray-800 mb-4 space-y-2">
+                    <p><span class="text-[color:var(--accent)] font-semibold">Tu es un</span> approvisionneur industriel.</p>
+                    <p><span class="text-[color:var(--accent)] font-semibold">Ta mission :</span> rédiger un mail ferme de relance pour une livraison en retard.</p>
+                    <p><span class="text-[color:var(--accent)] font-semibold">Contexte :</span> rupture de stock imminente sur la ligne de production.</p>
+                    <p><span class="text-[color:var(--accent)] font-semibold">Ton :</span> ferme et exigeant. <span class="text-[color:var(--accent)] font-semibold">Format :</span> email formel.</p>
+                    <p><span class="text-[color:var(--accent)] font-semibold">Instructions :</span> rappeler la date de commande ; mentionner les pénalités contractuelles ; exiger une livraison express à leurs frais.</p>
+                </div>
+                <p class="text-sm text-green-800 font-medium">
+                    Résultat : un mail directement envoyable, avec les bons arguments et le bon ton.
+                </p>
+            </div>
+        </div>
+
+        <p class="text-gray-600 mt-6 max-w-2xl">
+            La colonne de droite n'est pas plus « technique ». Elle est simplement
+            <strong>complète</strong>. Et c'est précisément ce que le PromptBuilder vous aide à
+            produire : il vous pose les questions, vous n'avez qu'à remplir.
+        </p>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="piliers">
+        <h2 class="text-2xl font-medium mb-2">Les 4 piliers d'une bonne demande</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">
+            Toute demande efficace tient en quatre briques. L'outil vous les présente dans cet ordre.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div class="card p-5">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="w-9 h-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center"><i class="fas fa-user-tie"></i></span>
+                    <h3 class="font-semibold">1. Persona — <span class="font-normal text-gray-500">qui parle ?</span></h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                    « Tu es un contrôleur de gestion senior. » Donner un rôle change le vocabulaire,
+                    le niveau de détail et les réflexes professionnels de la réponse. C'est le levier
+                    le plus rentable des quatre.
+                </p>
+            </div>
+            <div class="card p-5">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="w-9 h-9 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center"><i class="fas fa-bullseye"></i></span>
+                    <h3 class="font-semibold">2. Tâche — <span class="font-normal text-gray-500">quoi produire ?</span></h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                    Un verbe d'action et un livrable : « rédiger une fiche de non-conformité »,
+                    « comparer trois offres ». Évitez « parle-moi de… », qui n'est pas une commande.
+                </p>
+            </div>
+            <div class="card p-5">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="w-9 h-9 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center"><i class="fas fa-sitemap"></i></span>
+                    <h3 class="font-semibold">3. Contexte — <span class="font-normal text-gray-500">dans quelle situation ?</span></h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                    Les faits que vous seul connaissez : le lot défectueux, l'effectif concerné,
+                    l'échéance, l'historique. C'est ce qui transforme une réponse générique en réponse
+                    à <em>votre</em> problème.
+                </p>
+            </div>
+            <div class="card p-5">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="w-9 h-9 rounded-full bg-green-50 text-green-700 flex items-center justify-center"><i class="fas fa-table-list"></i></span>
+                    <h3 class="font-semibold">4. Format — <span class="font-normal text-gray-500">sous quelle forme ?</span></h3>
+                </div>
+                <p class="text-sm text-gray-600">
+                    Tableau, liste à puces, email, checklist… plus le ton (ferme, pédagogique,
+                    commercial). Demander un tableau vous épargne dix minutes de remise en forme.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="utiliser">
+        <h2 class="text-2xl font-medium mb-6">Comment s'en servir, concrètement</h2>
+
+        <ol class="space-y-5">
+            <li class="card p-5 flex gap-4">
+                <span class="step-num">1</span>
+                <div>
+                    <h3 class="font-semibold mb-1">Choisissez votre métier</h3>
+                    <p class="text-sm text-gray-600">
+                        Depuis le portail, ouvrez la bibliothèque qui vous correspond. Chacune arrive
+                        avec des modèles déjà écrits pour les situations courantes du métier, et un
+                        vocabulaire adapté. Si aucune ne colle, prenez
+                        <a href="general.html" class="text-[color:var(--accent)] underline">le constructeur général</a>.
+                    </p>
+                </div>
+            </li>
+            <li class="card p-5 flex gap-4">
+                <span class="step-num">2</span>
+                <div>
+                    <h3 class="font-semibold mb-1">Partez d'un modèle, puis adaptez</h3>
+                    <p class="text-sm text-gray-600">
+                        Le menu « ✨ Modèles » en haut remplit tous les champs d'un coup avec un exemple
+                        professionnel. C'est le meilleur point de départ : vous corrigez ce qui ne
+                        correspond pas à votre cas plutôt que de partir de la page blanche.
+                    </p>
+                </div>
+            </li>
+            <li class="card p-5 flex gap-4">
+                <span class="step-num">3</span>
+                <div>
+                    <h3 class="font-semibold mb-1">Lisez l'aperçu à droite</h3>
+                    <p class="text-sm text-gray-600">
+                        Le texte se construit en direct pendant que vous tapez. C'est ce texte, et rien
+                        d'autre, que recevra l'IA. Relisez-le comme si vous étiez l'intérimaire : est-ce
+                        que tout ce qu'il faut savoir y figure ?
+                        <span class="block mt-1 text-gray-500">Sur téléphone, l'aperçu est sur l'onglet « Résultat » en bas.</span>
+                    </p>
+                </div>
+            </li>
+            <li class="card p-5 flex gap-4">
+                <span class="step-num">4</span>
+                <div>
+                    <h3 class="font-semibold mb-1">Copiez, puis collez dans votre IA</h3>
+                    <p class="text-sm text-gray-600">
+                        Le bouton <strong>Copier</strong> met tout dans le presse-papier. Ouvrez Gemini,
+                        Claude, ChatGPT ou l'assistant de votre entreprise, et collez. C'est tout :
+                        l'outil ne parle à aucune IA lui-même, il prépare la demande.
+                    </p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="options">
+        <h2 class="text-2xl font-medium mb-2">Les options qui changent tout</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">
+            Quatre réglages passent souvent inaperçus alors qu'ils font la plus grosse différence.
+        </p>
+
+        <div class="space-y-4">
+            <div class="card p-5">
+                <h3 class="font-semibold mb-1 flex items-center gap-2">
+                    <i class="fas fa-comments text-[color:var(--accent)]"></i> La boucle de feedback
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Cette case demande à l'IA de <strong>vous poser des questions avant de répondre</strong>.
+                    Contre-intuitif, et pourtant : sur un sujet complexe, deux questions de clarification
+                    valent mieux qu'une longue réponse à côté. Cochez-la dès que votre demande est
+                    ambiguë ou que l'enjeu est important.
+                </p>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-semibold mb-1 flex items-center gap-2">
+                    <i class="fas fa-list-ol text-[color:var(--accent)]"></i> Les instructions
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Une liste de consignes précises : « cite les articles de loi », « reste sous
+                    300 mots », « propose trois options chiffrées ». C'est là qu'on met les exigences
+                    non négociables — celles que vous vérifieriez en relisant.
+                </p>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-semibold mb-1 flex items-center gap-2">
+                    <i class="fas fa-floppy-disk text-[color:var(--accent)]"></i> Enregistrer vos propres modèles
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Quand une demande fonctionne bien, l'icône disquette la sauvegarde sous le nom de
+                    votre choix. Elle réapparaîtra dans « Mes modèles » à votre prochaine visite. Une
+                    demande qui marche est un actif : ne la retapez pas tous les mois.
+                </p>
+            </div>
+            <div class="card p-5">
+                <h3 class="font-semibold mb-1 flex items-center gap-2">
+                    <i class="fas fa-globe text-[color:var(--accent)]"></i> Le bouton FR / EN
+                </h3>
+                <p class="text-sm text-gray-600">
+                    Il ne traduit pas seulement l'interface : il bascule aussi le prompt généré. Pratique
+                    pour écrire à un fournisseur étranger, ou parce que certains assistants restent un
+                    peu plus à l'aise en anglais.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="limites">
+        <h2 class="text-2xl font-medium mb-2">Ce que l'outil ne fait pas</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">Trois malentendus fréquents, autant les lever tout de suite.</p>
+
+        <div class="space-y-3">
+            <div class="card p-5 flex gap-4 items-start">
+                <i class="fas fa-robot text-gray-400 mt-1"></i>
+                <p class="text-sm text-gray-600">
+                    <strong class="text-gray-800">Il ne génère pas la réponse.</strong>
+                    Le PromptBuilder écrit la demande ; c'est votre assistant IA qui produit le
+                    résultat. Il n'y a aucune IA dans cette page.
+                </p>
+            </div>
+            <div class="card p-5 flex gap-4 items-start">
+                <i class="fas fa-paperclip text-gray-400 mt-1"></i>
+                <p class="text-sm text-gray-600">
+                    <strong class="text-gray-800">Les pièces jointes ne sont pas transmises.</strong>
+                    La zone « Pièces jointes » ne fait que <em>mentionner</em> les noms de fichiers dans
+                    le texte, pour que l'IA sache qu'ils existent. Vous devrez déposer les fichiers
+                    eux-mêmes dans votre assistant, à la main.
+                </p>
+            </div>
+            <div class="card p-5 flex gap-4 items-start">
+                <i class="fas fa-wand-magic-sparkles text-gray-400 mt-1"></i>
+                <p class="text-sm text-gray-600">
+                    <strong class="text-gray-800">Il ne vérifie pas les faits.</strong>
+                    Une demande bien construite réduit fortement les réponses inventées, mais ne les
+                    supprime pas. Chiffres, références légales et noms propres restent à vérifier —
+                    surtout en comptabilité et en droit.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="mb-14 anchor" id="confidentialite">
+        <h2 class="text-2xl font-medium mb-3">Et mes données ?</h2>
+        <div class="card p-6 border-l-4 border-l-green-400 max-w-3xl">
+            <p class="text-gray-700 mb-3">
+                <strong>Tout se passe dans votre navigateur.</strong> Ce que vous tapez n'est envoyé
+                nulle part : il n'y a ni serveur, ni compte, ni statistiques d'usage. Vous pouvez même
+                travailler hors connexion une fois la page chargée.
+            </p>
+            <p class="text-sm text-gray-600">
+                Les modèles que vous enregistrez restent stockés dans ce navigateur, sur cet ordinateur.
+                Ils ne vous suivent pas d'un poste à l'autre, et disparaissent si vous effacez les
+                données du site.
+                <span class="block mt-2">
+                    En revanche, une fois le prompt collé dans un assistant IA, ce sont les règles de
+                    confidentialité de cet assistant qui s'appliquent. Restez prudent avec les données
+                    personnelles et les informations confidentielles de votre entreprise.
+                </span>
+            </p>
+        </div>
+    </section>
+
+    <!-- ---------------------------------------------------------------- -->
+    <section class="anchor" id="commencer">
+        <h2 class="text-2xl font-medium mb-3">Prêt à essayer</h2>
+        <p class="text-gray-600 mb-6 max-w-2xl">
+            Le plus simple : ouvrez votre métier, chargez un modèle, et regardez le texte se
+            construire à droite. Vous comprendrez le principe en une minute.
+        </p>
+        <div class="flex flex-wrap gap-3 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[color:var(--accent)] text-white font-medium hover:opacity-90 transition shadow-sm">
+                <i class="fas fa-grip"></i> Choisir mon métier
+            </a>
+            <a href="general.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white border border-gray-300 text-gray-700 font-medium hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] transition">
+                <i class="fas fa-wand-magic-sparkles"></i> Constructeur général
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="border-t border-gray-200 mt-10 py-8 text-center no-print">
+    <p class="text-xs text-gray-500">
+        Développé par <strong class="text-gray-700">Fabrice Faucheux</strong> —
+        <a href="index.html" class="text-[color:var(--accent)] hover:underline">PromptBuilder Workspace</a>
+    </p>
+</footer>
+
+</body>
+</html>
