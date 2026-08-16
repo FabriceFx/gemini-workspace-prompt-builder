@@ -138,6 +138,7 @@
     <div class="flex flex-wrap justify-center gap-2 mb-8 fade-in w-full max-w-4xl" style="animation-delay: 0.2s;">
         <button type="button" onclick="filterCards('all')" data-filter="all" class="filter-btn active px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_all">Tout voir</button>
         <button type="button" onclick="filterCards('gestion')" data-filter="gestion" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_gestion">Gestion & Bureau</button>
+        <button type="button" onclick="filterCards('commerce')" data-filter="commerce" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_commerce">RH &amp; Commerce</button>
         <button type="button" onclick="filterCards('terrain')" data-filter="terrain" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_terrain">Terrain & Artisanat</button>
         <button type="button" onclick="filterCards('tech')" data-filter="tech" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_tech">Tech & Savoir</button>
         <button type="button" onclick="filterCards('autre')" data-filter="autre" class="filter-btn px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-600 shadow-sm" data-translate="tab_other">Autre</button>
@@ -209,6 +210,30 @@
             <p class="text-sm text-gray-500" data-translate="card_it_desc">Développement, infrastructure et support.</p>
         </a>
 
+        <a href="LePromptRH.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="commerce">
+            <div class="icon-circle w-16 h-16 rounded-full bg-yellow-50 text-yellow-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_rh_title">RH</h3>
+            <p class="text-sm text-gray-500" data-translate="card_rh_desc">Recrutement, entretiens et notes de service.</p>
+        </a>
+
+        <a href="LePromptCommercial.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="commerce">
+            <div class="icon-circle w-16 h-16 rounded-full bg-orange-50 text-orange-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_commercial_title">Commercial</h3>
+            <p class="text-sm text-gray-500" data-translate="card_commercial_desc">Prospection, relances et comptes rendus.</p>
+        </a>
+
+        <a href="LePromptMarketing.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="commerce">
+            <div class="icon-circle w-16 h-16 rounded-full bg-fuchsia-50 text-fuchsia-700 flex items-center justify-center text-2xl mb-4 transition-colors">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3 class="text-xl font-medium text-gray-800 mb-2" data-translate="card_marketing_title">Marketing</h3>
+            <p class="text-sm text-gray-500" data-translate="card_marketing_desc">Posts, newsletters et communiqués.</p>
+        </a>
+
         <a href="general.html" class="card-item card-btn bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col items-center text-center group cursor-pointer text-decoration-none" data-category="autre">
             <div class="icon-circle w-16 h-16 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 transition-colors">
                 <i class="fas fa-wand-magic-sparkles"></i>
@@ -248,6 +273,13 @@
                 how_step3_title: "3. Génère",
                 how_step3_text: "Colle dans l'IA.",
                 // Tabs
+                tab_commerce: "RH & Commerce",
+                card_rh_title: "RH",
+                card_rh_desc: "Recrutement & entretiens.",
+                card_commercial_title: "Commercial",
+                card_commercial_desc: "Prospection & relances.",
+                card_marketing_title: "Marketing",
+                card_marketing_desc: "Posts & newsletters.",
                 tab_all: "Tout voir",
                 tab_gestion: "Gestion & Bureau",
                 tab_terrain: "Terrain & Artisanat",
@@ -290,6 +322,13 @@
                 how_step3_title: "3. Generate",
                 how_step3_text: "Paste into AI.",
                 // Tabs
+                tab_commerce: "HR & Sales",
+                card_rh_title: "HR",
+                card_rh_desc: "Hiring & reviews.",
+                card_commercial_title: "Sales",
+                card_commercial_desc: "Prospecting & follow-ups.",
+                card_marketing_title: "Marketing",
+                card_marketing_desc: "Posts & newsletters.",
                 tab_all: "View All",
                 tab_gestion: "Business & Office",
                 tab_terrain: "Field & Craft",
