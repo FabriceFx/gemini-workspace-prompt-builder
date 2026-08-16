@@ -12,6 +12,7 @@
 ![Auteur](https://img.shields.io/badge/Auteur-Fabrice%20Faucheux-orange)
 
 **🔗 [Ouvrir l'outil](https://fabricefx.github.io/gemini-workspace-prompt-builder/)**
+ · **📘 [Guide du débutant](https://fabricefx.github.io/gemini-workspace-prompt-builder/guide.html)**
 
 ---
 
@@ -35,7 +36,7 @@ L'outil affiche en temps réel le prompt généré, en Markdown ou en JSON, prê
 - **8 bibliothèques métier + un constructeur universel** — chaque métier fournit
   ses modèles pré-remplis, ses tons et ses formats adaptés au vocabulaire du secteur.
 - **Modèles personnalisés** — enregistrement de ses propres prompts dans le
-  `localStorage` du navigateur (chaque métier a son espace de stockage).
+  `localStorage` du navigateur (chaque bibliothèque a son espace de stockage).
 - **Interface bilingue FR/EN** — bascule instantanée des libellés *et* du prompt
   généré. La langue du navigateur est détectée au chargement.
 - **Boucle de feedback** — option demandant à l'IA de poser ses questions de
@@ -45,59 +46,105 @@ L'outil affiche en temps réel le prompt généré, en Markdown ou en JSON, prê
   (rappel explicite : le copier-coller ne transfère pas les fichiers eux-mêmes).
 - **Responsive** — navigation par onglets Éditer / Résultat sur mobile.
 
-## Structure du projet
+## Architecture
 
-| Fichier | Rôle |
-|---|---|
-| `index.html` | Portail de navigation, avec filtres par famille de métier |
-| `general.html` | Constructeur universel — pas de bibliothèque de modèles ni d'enregistrement |
-| `LePromptAchat.html` | Achats — appels d'offres, négociation, TCO, relances |
-| `LePromptAgricole.html` | Agricole — exploitation, PAC, cultures |
-| `LePromptComptable.html` | Comptabilité — bilans, audits, fiscalité |
-| `LePromptEducation.html` | Éducation — plans de cours, évaluations |
-| `LePromptIT.html` | IT & Tech — développement, infrastructure, support |
-| `LePromptJuridique.html` | Juridique — contrats, veille, mémos |
-| `LePromptPeintreDecorateur.html` | Peinture & décoration — couleurs, métrés, devis |
-| `LePromptQualite.html` | Qualité — normes ISO, audits, non-conformités |
+Un **moteur unique** sert les neuf pages du constructeur. Les pages ne
+contiennent aucune logique : elles déclarent leurs métadonnées, chargent leur
+bibliothèque métier, et le moteur construit l'interface.
 
-Chaque page est **autonome** : HTML, CSS et JavaScript dans un seul fichier,
-aucune dépendance à installer, aucune étape de build.
+```
+index.html                      Portail de navigation
+guide.html                      Guide pédagogique pour débutants
+
+general.html                    ┐
+LePromptAchat.html              │ 9 pages du constructeur,
+LePromptAgricole.html           │ ~50 lignes chacune :
+LePromptComptable.html          │ métadonnées + 2 balises <script>
+LePromptEducation.html          │
+LePromptIT.html                 │
+LePromptJuridique.html          │
+LePromptPeintreDecorateur.html  │
+LePromptQualite.html            ┘
+
+assets/
+  builder.js                    Le moteur : toute la logique, une seule fois
+  builder.css                   Les styles, thémés par variables CSS
+  libraries/
+    achat.js                    ┐ Données pures : couleurs, libellés FR/EN,
+    agricole.js                 │ tons, formats et modèles du métier.
+    …                           ┘ Aucune logique.
+```
+
+Il n'y a **aucune étape de build** : les fichiers sont servis tels quels, et
+peuvent être modifiés directement depuis l'interface web de GitHub.
+
+### Ajouter un métier
+
+1. Copiez `assets/libraries/general.js` vers `assets/libraries/<metier>.js` et
+   adaptez son contenu : `slug`, `name`, `storageKey`, `theme`, `strings`,
+   `tones`, `formats`, `templates`.
+2. Copiez une page existante (par exemple `LePromptQualite.html`), changez le
+   titre, la description, les balises Open Graph et le `src` de la bibliothèque.
+3. Ajoutez une carte dans `index.html`.
+
+Aucune ligne de `builder.js` n'est à modifier.
+
+### Points de vigilance
+
+- Une valeur de `tone` ou de `format` employée par un modèle **doit** exister
+  dans les listes `tones` / `formats` de la même bibliothèque, sinon le réglage
+  est ignoré au chargement du modèle.
+- Tout ce qui vient de l'utilisateur (instructions, noms de fichiers, noms de
+  modèles) est inséré via `.value` ou `.textContent`, jamais par concaténation
+  HTML. Conservez cette règle si vous touchez au moteur.
 
 ## Installation & déploiement
 
 ### Utilisation directe
 
-Ouvrez [le site](https://fabricefx.github.io/gemini-workspace-prompt-builder/),
-ou téléchargez le fichier HTML de votre métier et double-cliquez dessus. Les
-polices, icônes et Tailwind sont chargés depuis leurs CDN : une connexion est
-nécessaire au premier affichage.
+Ouvrez [le site](https://fabricefx.github.io/gemini-workspace-prompt-builder/).
+Les polices, icônes et Tailwind viennent de leurs CDN : une connexion est
+nécessaire au premier affichage, puis la page fonctionne hors ligne.
+
+### Usage local ou hors ligne
+
+Récupérez le dépôt entier (**Code → Download ZIP**) et ouvrez `index.html`.
+Les pages ont besoin du dossier `assets/` : un fichier HTML seul ne suffit plus
+depuis la mise en commun du moteur.
 
 ### Hébergement (GitHub Pages, intranet, partage réseau)
 
-Copiez les fichiers tels quels à la racine du serveur. Rien d'autre à configurer.
+Copiez l'arborescence telle quelle à la racine du serveur, en conservant le
+dossier `assets/`. Rien d'autre à configurer.
 
 ### Intégration dans Google Workspace (optionnel)
 
-Pour servir l'outil depuis un domaine Workspace via Apps Script :
+Apps Script ne sert pas de dossier statique : il faut donc reconstituer une page
+autonome. Créez un fichier HTML par page à publier et un `Code.gs` :
 
-1. Créez un projet sur [script.google.com](https://script.google.com).
-2. Ajoutez un fichier HTML par page à publier (par exemple `index`), et collez-y
-   le contenu du fichier correspondant.
-3. Ajoutez un fichier `Code.gs` :
+```javascript
+function doGet() {
+  return HtmlService.createTemplateFromFile('index').evaluate()
+    .setTitle('Prompt Builder')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
 
-   ```javascript
-   function doGet() {
-     return HtmlService.createHtmlOutputFromFile('index')
-       .setTitle('Prompt Builder')
-       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-   }
-   ```
+function include(name) {
+  return HtmlService.createHtmlOutputFromFile(name).getContent();
+}
+```
 
-4. Déployez en tant qu'**Application Web**.
+Dans le fichier HTML, remplacez les balises externes par des inclusions :
 
-> Les liens entre pages (`href="LePromptAchat.html"`) ne fonctionnent pas tels
-> quels dans Apps Script : le routage y passe par des paramètres d'URL. Pour un
-> usage multi-pages, l'hébergement statique reste le plus simple.
+```html
+<style><?!= include('builder_css') ?></style>
+<script><?!= include('achat_js') ?></script>
+<script><?!= include('builder_js') ?></script>
+```
+
+> Pour un usage multi-métiers, l'hébergement statique reste nettement plus
+> simple : les liens entre pages fonctionnent tels quels, alors qu'Apps Script
+> impose un routage par paramètres d'URL.
 
 ## Données & confidentialité
 
@@ -108,13 +155,14 @@ disparaissent si l'utilisateur vide les données du site.
 
 ## Limites connues
 
-- Tailwind est chargé via son CDN, pratique pour un fichier autonome mais non
-  recommandé en production : il alourdit le chargement et affiche un avertissement
-  en console. Une compilation via Tailwind CLI supprimerait les deux.
-- La logique applicative est dupliquée dans chaque page métier : toute correction
-  doit être reportée manuellement sur l'ensemble des fichiers.
+- Tailwind est chargé via son CDN, pratique mais non recommandé en production :
+  il alourdit le chargement et affiche un avertissement en console. Une
+  compilation via Tailwind CLI supprimerait les deux — c'est aujourd'hui un
+  changement contenu, puisqu'un seul fichier de styles est concerné.
 - Les pièces jointes sont seulement *mentionnées* dans le prompt : leur contenu
   doit être fourni à l'IA séparément.
+- Le moteur construit l'interface en JavaScript ; sans JS, les pages du
+  constructeur affichent un message de repli vers le portail.
 
 ## Contribuer
 
@@ -129,6 +177,7 @@ Un métier manquant ? Ouvrez une *issue* ou écrivez à
 > running entirely in the browser.
 
 **🔗 [Open the tool](https://fabricefx.github.io/gemini-workspace-prompt-builder/)**
+ · **📘 [Beginner's guide](https://fabricefx.github.io/gemini-workspace-prompt-builder/guide.html)**
 
 ### Overview
 
@@ -150,7 +199,7 @@ Gemini, Claude, ChatGPT or any other assistant.
 - **8 industry libraries plus a universal builder** — each industry ships its own
   pre-filled templates, tones and output formats matching its vocabulary.
 - **Custom templates** — save your own prompts to the browser's `localStorage`
-  (each industry has its own storage namespace).
+  (each library has its own storage namespace).
 - **Bilingual FR/EN interface** — instantly switches both the UI labels and the
   generated prompt. Browser language is detected on load.
 - **Feedback loop** — optionally instructs the AI to ask clarifying questions
@@ -160,20 +209,20 @@ Gemini, Claude, ChatGPT or any other assistant.
   copy/paste does not transfer the files themselves.
 - **Responsive** — Edit / Result tab navigation on mobile.
 
-### Project structure
+### Architecture
 
-Every page is **self-contained**: HTML, CSS and JavaScript in a single file, no
-dependencies to install, no build step. `index.html` is the portal,
-`general.html` the universal builder, and each `LePrompt*.html` a specialised
-industry version. Note that the application logic is duplicated across those
-files, so a fix has to be applied to each of them.
+A **single engine** (`assets/builder.js`) powers all nine builder pages. Each
+page only declares its metadata and loads its industry library from
+`assets/libraries/`; the engine builds the interface from there. Adding an
+industry means adding one data file and one short page — the engine never
+changes. There is no build step: files are served as-is.
 
 ### Installation
 
 Open [the site](https://fabricefx.github.io/gemini-workspace-prompt-builder/),
-or download the HTML file you need and open it in your browser. Fonts, icons and
-Tailwind load from their CDNs, so a connection is required on first render. For
-self-hosting, copy the files as-is to any static web server.
+or download the whole repository (**Code → Download ZIP**) and open `index.html`.
+The pages need the `assets/` folder alongside them. For self-hosting, copy the
+tree as-is to any static web server.
 
 ### Data & privacy
 
