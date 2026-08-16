@@ -79,15 +79,34 @@
                 <div class="template-select-wrapper flex-grow sm:flex-grow-0 min-w-[140px] max-w-[200px]">
                     <label class="sr-only" for="template-selector" id="lbl-template-selector"></label>
                     <select id="template-selector" class="w-full template-select text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition border border-gray-200 focus:outline-none"></select>
-                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none"></i>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none"></i>
                 </div>
 
                 <button type="button" id="btn-save-template" class="text-gray-500 hover:text-[color:var(--accent)] hover:bg-[color:var(--tint)] p-2 rounded-full transition">
                     <i class="far fa-save"></i>
                 </button>
-                <button type="button" id="btn-delete-template" class="hidden text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition">
+                <button type="button" id="btn-delete-template" class="hidden text-gray-500 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition">
                     <i class="far fa-trash-alt"></i>
                 </button>
+
+                <div class="relative">
+                    <button type="button" id="btn-more" aria-haspopup="true" aria-expanded="false" class="text-gray-500 hover:text-[color:var(--accent)] hover:bg-[color:var(--tint)] p-2 rounded-full transition">
+                        <i class="fas fa-ellipsis-vertical"></i>
+                    </button>
+                    <div id="menu-more" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50" role="menu">
+                        <button type="button" id="btn-export" role="menuitem" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
+                            <i class="fas fa-file-export w-4 text-gray-500"></i><span></span>
+                        </button>
+                        <button type="button" id="btn-import" role="menuitem" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
+                            <i class="fas fa-file-import w-4 text-gray-500"></i><span></span>
+                        </button>
+                        <div class="h-px bg-gray-100 my-1"></div>
+                        <button type="button" id="btn-share" role="menuitem" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3">
+                            <i class="fas fa-link w-4 text-gray-500"></i><span></span>
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="import-file" accept="application/json,.json" class="hidden">
 
                 <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
@@ -145,7 +164,7 @@
                     <input type="checkbox" id="feedback-loop" class="m3-checkbox">
                     <span class="text-sm text-[color:var(--on-surface-muted)] font-medium" id="lbl-feedback"></span>
                 </label>
-                <p class="text-xs text-gray-400 pl-8" id="txt-feedback-help"></p>
+                <p class="text-xs text-gray-500 pl-8" id="txt-feedback-help"></p>
             </div>
 
             <div class="md:hidden pt-8 pb-4 text-center border-t border-gray-100 mt-4">
@@ -179,10 +198,15 @@
             </button>
         </div>
 
+        <div id="coach" class="coach hidden" role="status" aria-live="polite">
+            <i id="coach-icon"></i>
+            <p><span id="coach-text" class="font-medium"></span> <span id="coach-hint" class="coach-hint"></span></p>
+        </div>
+
         <div class="flex-grow p-4 overflow-hidden">
             <div class="h-full w-full bg-white rounded-3xl border border-white shadow-sm overflow-hidden flex flex-col">
                 <div id="view-markdown" role="tabpanel" class="p-6 md:p-8 overflow-y-auto h-full max-w-none text-gray-700 text-sm md:text-base">
-                    <div class="flex items-center gap-2 text-gray-400 mb-4 opacity-50 select-none">
+                    <div class="flex items-center gap-2 text-gray-500 mb-4 opacity-70 select-none">
                         <i class="fas fa-wand-magic-sparkles"></i> <span id="lbl-generated"></span>
                     </div>
                     <div id="markdown-content" class="whitespace-pre-wrap leading-relaxed"></div>
@@ -241,14 +265,48 @@
               name_placeholder: 'Nom du modèle', cancel: 'Annuler', save: 'Enregistrer',
               saved: 'Modèle sauvegardé !', confirm_reset: 'Tout effacer ?',
               confirm_delete: 'Supprimer ce modèle ?', storage_error: "Stockage local indisponible : le modèle n'a pas pu être enregistré.",
-              add_instruction: 'Ajouter une instruction', remove: 'Supprimer' },
+              add_instruction: 'Ajouter une instruction', remove: 'Supprimer',
+              // Menu secondaire
+              more_title: 'Autres actions', export: 'Exporter mes modèles',
+              import: 'Importer des modèles', share: 'Copier un lien de partage',
+              export_empty: "Vous n'avez aucun modèle personnalisé à exporter.",
+              exported: 'Modèles exportés.',
+              imported: (n) => `${n} modèle${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''}.`,
+              import_invalid: "Fichier illisible : ce n'est pas un export de modèles.",
+              share_warning: "Le lien contiendra tout le texte saisi. Il circulera dans des messageries qui l'archivent : ne l'utilisez pas pour des données confidentielles.\n\nCopier quand même le lien ?",
+              share_copied: 'Lien copié dans le presse-papier.',
+              share_loaded: 'Prompt chargé depuis le lien partagé.',
+              share_invalid: 'Le lien partagé est illisible.',
+              // Coach de complétude
+              coach_missing: 'Piliers non renseignés :',
+              coach_hint: 'Sans eux, la réponse sera générique.',
+              coach_ok: 'Les 4 piliers sont renseignés.',
+              coach_ok_hint: 'Ajoutez des instructions pour cadrer davantage la réponse.',
+              pillar_persona: 'Persona', pillar_task: 'Tâche',
+              pillar_context: 'Contexte', pillar_format: 'Format' },
         en: { feedback_help: 'Ask the AI to ask clarifying questions before answering.',
               save_title: 'Save this template', delete_title: 'Delete this template',
               reset_title: 'Clear all', lang_title: 'Switch language',
               name_placeholder: 'Template name', cancel: 'Cancel', save: 'Save',
               saved: 'Template saved!', confirm_reset: 'Clear all?',
               confirm_delete: 'Delete this template?', storage_error: 'Local storage unavailable: the template could not be saved.',
-              add_instruction: 'Add an instruction', remove: 'Remove' },
+              add_instruction: 'Add an instruction', remove: 'Remove',
+              more_title: 'More actions', export: 'Export my templates',
+              import: 'Import templates', share: 'Copy a shareable link',
+              export_empty: 'You have no custom templates to export.',
+              exported: 'Templates exported.',
+              imported: (n) => `${n} template${n > 1 ? 's' : ''} imported.`,
+              import_invalid: 'Unreadable file: this is not a template export.',
+              share_warning: 'The link will contain everything you typed. It will travel through messaging tools that archive it — do not use it for confidential data.\n\nCopy the link anyway?',
+              share_copied: 'Link copied to clipboard.',
+              share_loaded: 'Prompt loaded from the shared link.',
+              share_invalid: 'The shared link is unreadable.',
+              coach_missing: 'Missing pillars:',
+              coach_hint: 'Without them, the answer will be generic.',
+              coach_ok: 'All 4 pillars are filled in.',
+              coach_ok_hint: 'Add instructions to steer the answer further.',
+              pillar_persona: 'Persona', pillar_task: 'Task',
+              pillar_context: 'Context', pillar_format: 'Format' },
     };
     const ui = () => UI[state.lang];
 
@@ -285,6 +343,12 @@
         $('template-name-input').placeholder = ui().name_placeholder;
         $('btn-modal-cancel').textContent = ui().cancel;
         $('btn-modal-confirm').textContent = ui().save;
+
+        $('btn-more').title = ui().more_title;
+        $('btn-more').setAttribute('aria-label', ui().more_title);
+        $('btn-export').querySelector('span').textContent = ui().export;
+        $('btn-import').querySelector('span').textContent = ui().import;
+        $('btn-share').querySelector('span').textContent = ui().share;
     }
 
     // --------------------------------------------------------------- options
@@ -433,7 +497,7 @@
         });
         input.value = typeof value === 'string' ? value : '';   // saisie utilisateur : jamais via innerHTML
         const remove = el('button', {
-            type: 'button', class: 'text-gray-400 hover:text-red-500', 'aria-label': ui().remove,
+            type: 'button', class: 'text-gray-500 hover:text-red-500', 'aria-label': ui().remove,
             onclick: () => { row.remove(); updateOutput(); },
         }, [icon('fas fa-times')]);
         row.append(input, remove);
@@ -531,6 +595,7 @@
         $('markdown-content').textContent = generateMarkdown();
         // Le JSON est échappé avant coloration : aucune saisie ne peut produire du balisage.
         $('json-content').innerHTML = syntaxHighlight(JSON.stringify(generateJSON(), null, 2));
+        updateCoach();
     }
 
     // ----------------------------------------------------------------- vues
@@ -594,9 +659,166 @@
         updateOutput();
     }
 
+    // ------------------------------------------------ coach de complétude
+    function updateCoach() {
+        const box = $('coach');
+        const filled = state.role || state.task || state.context || state.constraints
+            || state.instructions.length || state.toneKey || state.formatKey;
+        if (!filled) { box.className = 'coach hidden'; return; }   // page vierge : on ne réprimande pas
+
+        const missing = [];
+        if (!state.role) missing.push(ui().pillar_persona);
+        if (!state.task) missing.push(ui().pillar_task);
+        if (!state.context) missing.push(ui().pillar_context);
+        if (!state.toneKey && !state.formatKey) missing.push(ui().pillar_format);
+
+        const complete = missing.length === 0;
+        box.className = 'coach ' + (complete ? 'coach--ok' : 'coach--warn');
+        $('coach-icon').className = 'fas ' + (complete ? 'fa-circle-check' : 'fa-lightbulb');
+        $('coach-text').textContent = complete ? ui().coach_ok : `${ui().coach_missing} ${missing.join(', ')}`;
+        $('coach-hint').textContent = complete
+            ? (state.instructions.length ? '' : ui().coach_ok_hint)
+            : ui().coach_hint;
+    }
+
+    // ------------------------------------------- export / import de modèles
+    function exportTemplates() {
+        if (!customTemplates.length) { showToast(ui().export_empty); return; }
+        const payload = { format: 'promptbuilder-templates', version: 1, library: LIB.slug, templates: customTemplates };
+        const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+        const link = el('a', { href: url, download: `promptbuilder-${LIB.slug}-modeles.json` });
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showToast(ui().exported);
+    }
+
+    // Un modèle importé doit au minimum porter un nom et un contenu exploitable.
+    const isTemplate = (t) => t && typeof t === 'object' && typeof t.name === 'string' && t.name.trim() !== ''
+        && ['role', 'task', 'context', 'constraints'].some((k) => typeof t[k] === 'string' && t[k] !== '');
+
+    function importTemplates(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            let list;
+            try {
+                const parsed = JSON.parse(String(reader.result));
+                list = Array.isArray(parsed) ? parsed : parsed.templates;   // accepte aussi un tableau nu
+            } catch (e) { showToast(ui().import_invalid); return; }
+
+            if (!Array.isArray(list)) { showToast(ui().import_invalid); return; }
+            const valid = list.filter(isTemplate);
+            if (!valid.length) { showToast(ui().import_invalid); return; }
+
+            let stamp = Date.now();
+            valid.forEach((tpl) => {
+                customTemplates.push({
+                    id: String(stamp++),                       // identifiant neuf : jamais d'écrasement
+                    name: String(tpl.name),
+                    role: String(tpl.role || ''), task: String(tpl.task || ''),
+                    context: String(tpl.context || ''), constraints: String(tpl.constraints || ''),
+                    tone: String(tpl.tone || ''), format: String(tpl.format || ''),
+                    feedback: Boolean(tpl.feedback),
+                    instructions: Array.isArray(tpl.instructions) ? tpl.instructions.map(String) : [],
+                });
+            });
+            if (persistCustomTemplates()) { renderTemplateList(); showToast(ui().imported(valid.length)); }
+        };
+        reader.onerror = () => showToast(ui().import_invalid);
+        reader.readAsText(file);
+    }
+
+    // ------------------------------------------------------ lien de partage
+    // base64url compatible UTF-8, par blocs pour ne pas saturer la pile d'appels.
+    function toBase64Url(text) {
+        const bytes = new TextEncoder().encode(text);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) {
+            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+        }
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function fromBase64Url(encoded) {
+        const binary = atob(encoded.replace(/-/g, '+').replace(/_/g, '/'));
+        return new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+    }
+
+    function shareLink() {
+        readForm();
+        // Le fragment n'est jamais transmis au serveur, mais le lien lui-même circule :
+        // l'utilisateur doit décider en connaissance de cause.
+        if (!window.confirm(ui().share_warning)) return;
+        const payload = { v: 1, lang: state.lang, role: state.role, task: state.task,
+            context: state.context, tone: state.toneKey, format: state.formatKey,
+            constraints: state.constraints, feedback: state.feedbackLoop, instructions: state.instructions };
+        const url = location.origin + location.pathname + '#p=' + toBase64Url(JSON.stringify(payload));
+        navigator.clipboard.writeText(url)
+            .then(() => showToast(ui().share_copied))
+            .catch(() => showToast(ui().share_copied));
+    }
+
+    function loadFromHash() {
+        if (!location.hash.startsWith('#p=')) return false;
+        try {
+            const data = JSON.parse(fromBase64Url(location.hash.slice(3)));
+            if (!data || typeof data !== 'object') throw new Error('payload');
+            if (data.lang === 'fr' || data.lang === 'en') state.lang = data.lang;
+            $('role').value = String(data.role || '');
+            $('task').value = String(data.task || '');
+            $('context').value = String(data.context || '');
+            $('constraints').value = String(data.constraints || '');
+            state.toneKey = String(data.tone || '');
+            state.formatKey = String(data.format || '');
+            $('feedback-loop').checked = Boolean(data.feedback);
+            $('instructions-container').innerHTML = '';
+            const list = Array.isArray(data.instructions) ? data.instructions : [];
+            if (list.length) list.forEach((i) => addInstruction(String(i)));
+            else addInstruction();
+            return true;
+        } catch (e) {
+            console.warn('Lien partagé illisible.', e);
+            showToast(ui().share_invalid);
+            return false;
+        }
+    }
+
     // ---------------------------------------------------------------- modale
-    const openModal = () => { $('modal-save').classList.remove('hidden'); $('template-name-input').focus(); };
-    const closeModal = () => { $('modal-save').classList.add('hidden'); $('template-name-input').value = ''; };
+    let lastFocused = null;
+
+    function openModal() {
+        lastFocused = document.activeElement;
+        $('modal-save').classList.remove('hidden');
+        $('template-name-input').focus();
+    }
+
+    function closeModal() {
+        if ($('modal-save').classList.contains('hidden')) return;
+        $('modal-save').classList.add('hidden');
+        $('template-name-input').value = '';
+        if (lastFocused && lastFocused.focus) lastFocused.focus();
+        lastFocused = null;
+    }
+
+    // Maintient le focus clavier à l'intérieur de la modale tant qu'elle est ouverte.
+    function trapFocus(event) {
+        if (event.key !== 'Tab' || $('modal-save').classList.contains('hidden')) return;
+        const focusable = $('modal-save').querySelectorAll('input, button');
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+
+    // ------------------------------------------------------- menu secondaire
+    function toggleMenu(force) {
+        const menu = $('menu-more');
+        const open = force !== undefined ? force : menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', !open);
+        $('btn-more').setAttribute('aria-expanded', String(open));
+    }
 
     // ----------------------------------------------------------------- thème
     // Correspondance explicite entre les clés de la bibliothèque et les
@@ -619,12 +841,18 @@
         if ((navigator.language || 'fr').toLowerCase().startsWith('en')) state.lang = 'en';
 
         loadCustomTemplates();
+
+        // Un lien partagé impose sa langue et son contenu : il est lu avant le
+        // premier rendu, pour éviter d'afficher puis d'écraser un formulaire vide.
+        const fromLink = loadFromHash();
+
         applyLanguage();
         renderOptions();
         renderTemplateList();
-        addInstruction();
+        if (!fromLink) addInstruction();
         updateOutput();
         switchTab('markdown');
+        if (fromLink) showToast(ui().share_loaded);
 
         $('btn-lang').addEventListener('click', () => {
             state.lang = state.lang === 'fr' ? 'en' : 'fr';
@@ -652,7 +880,21 @@
         ['role', 'task', 'context', 'constraints'].forEach((id) => $(id).addEventListener('input', updateOutput));
         ['tone', 'format'].forEach((id) => $(id).addEventListener('change', updateOutput));
         $('feedback-loop').addEventListener('change', updateOutput);
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        $('btn-more').addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+        $('btn-export').addEventListener('click', () => { toggleMenu(false); exportTemplates(); });
+        $('btn-import').addEventListener('click', () => { toggleMenu(false); $('import-file').click(); });
+        $('btn-share').addEventListener('click', () => { toggleMenu(false); shareLink(); });
+        $('import-file').addEventListener('change', (e) => {
+            if (e.target.files[0]) importTemplates(e.target.files[0]);
+            e.target.value = '';
+        });
+        document.addEventListener('click', () => toggleMenu(false));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeModal(); toggleMenu(false); }
+            trapFocus(e);
+        });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
@@ -661,5 +903,7 @@
     // Exposé pour les tests de non-régression.
     window.__builder = { state, addInstruction, addFiles, renderFiles, updateOutput, applyTemplate,
                          saveTemplate, renderTemplateList, generateMarkdown, resetForm,
+                         importTemplates, exportTemplates, toBase64Url, fromBase64Url,
+                         updateCoach, toggleMenu, openModal, closeModal, isTemplate,
                          get customTemplates() { return customTemplates; }, LIB };
 })();

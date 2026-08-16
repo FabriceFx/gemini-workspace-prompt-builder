@@ -127,6 +127,26 @@ body {
 /* --- Modale ------------------------------------------------------------- */
 .modal-backdrop { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); }
 
+/* --- Bandeau de complétude ---------------------------------------------
+   Couleurs définies ici plutôt qu'en classes utilitaires : le bandeau change
+   d'état après le chargement, et l'on ne veut pas dépendre du moment où le
+   CDN Tailwind génère la règle correspondante. */
+.coach {
+    flex: none;
+    margin: 0 1rem 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+}
+.coach--warn { background-color: #fffbeb; color: #78350f; border-color: #fde68a; }
+.coach--ok   { background-color: #f0fdf4; color: #14532d; border-color: #bbf7d0; }
+.coach-hint  { opacity: 0.85; }
+
 /* --- Divers ------------------------------------------------------------- */
 .accent { color: var(--accent); }
 .accent-bg { background-color: var(--accent); }
